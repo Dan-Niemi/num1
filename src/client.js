@@ -1,5 +1,4 @@
 import PartySocket from "partysocket";
-let cursors = Alpine.store('data').cursors
 
 const socket = new PartySocket({
   host: PARTYKIT_HOST,
@@ -22,17 +21,16 @@ socket.onmessage = (event) => {
   const data = JSON.parse(event.data);
   switch (data.type) {
     case "cursorInit":
-      cursors = new Map(Object.entries(data.cursors));
-      id = data.id;
-      console.log(id)
+      Alpine.store('data').cursors = new Map(Object.entries(data.cursors));
+      Alpine.store('data').id = data.id;
       updateCursors();
       break;
     case "cursorUpdate":
-      cursors.set(data.id, data.position)
+      Alpine.store('data').cursors.set(data.id, data.position)
       updateCursors();
       break;
     case "cursorRemove":
-      cursors.delete(data.id);
+      Alpine.store('data').cursors.delete(data.id);
       updateCursors();
       break;
     case "chat":
