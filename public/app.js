@@ -18,6 +18,8 @@ let polygons = [],
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
+    cursors: new Map(),
+    id: null,
     init() {
       console.log('alpine store running')
     },

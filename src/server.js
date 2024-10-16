@@ -1,6 +1,7 @@
 class PartyServer {
   constructor(room) {
     this.room = room;
+    this.cursors = new Map();
   }
 
   onConnect(conn, ctx) {
@@ -10,12 +11,39 @@ class PartyServer {
         room: ${this.room.id}
         url: ${new URL(ctx.request.url).pathname}`
     );
-    conn.send(JSON.stringify({ type: "welcome", message: "Welcome to the chat!" }));
+    this.cursors.set(conn.id, {x:0,y:0});
+    const existingCursors = Object.fromEntries(this.cursors);
+    conn.send(JSON.stringify({ type: "cursorInit", cursors: existingCursors, id:conn.id }));
   }
 
   onMessage(message, sender) {
-    console.log(`connection ${sender.id} sent message: ${message}`);
-    this.room.broadcast(`${sender.id}: ${message}`);
+    const data = JSON.parse(message);
+    
+    if (data.type === "cursor") {
+      this.cursors.set(sender.id, data.position);
+      this.broadcastCursorUpdate(sender.id, data.position);
+    }
+  }
+
+  onClose(conn) {
+    this.cursors.delete(conn.id);
+    this.room.broadcast(
+      JSON.stringify({
+        type: "cursorRemove",
+        id: conn.id,
+      })
+    );
+  }
+
+  broadcastCursorUpdate(id, position) {
+    this.room.broadcast(
+      JSON.stringify({
+        type: "cursorUpdate",
+        id: id,
+        position: position,
+      }),
+      [id]
+    );
   }
 }
 
