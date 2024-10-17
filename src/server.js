@@ -1,13 +1,13 @@
 import * as gameData from "../GameData.json";
 
-
+const rocks = new Map(gameData.rocks.map((r) => [r.id, r]));
 class PartyServer {
   constructor(room) {
     this.room = room;
     this.cursors = new Map();
     this.seed = "dan";
+    this.rocks = rocks;
   }
-
   onConnect(conn, ctx) {
     console.log(
       `Connected:
@@ -26,8 +26,20 @@ class PartyServer {
       this.cursors.set(sender.id, data.position);
       this.broadcastCursorUpdate(sender.id, data.position);
     }
+    if (data.type === "rockUpdate") {
+      rocks.get(data.id).pos = data.pos;
+      rocks.get(data.id).rot = data.rot;
+      this.room.broadcast(
+        JSON.stringify({
+          type: "rockUpdate",
+          pos: data.pos,
+          rot: data.rot,
+          id: data.id,
+        }),
+        [sender.id]
+      );
+    }
   }
-
   onClose(conn) {
     this.cursors.delete(conn.id);
     this.room.broadcast(

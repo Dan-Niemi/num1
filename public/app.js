@@ -4,9 +4,7 @@ const MOUSE_ROTATION = 0.003;
 const MOUSE_ROTATION_FINE = 0.0005;
 const KEY_FINE = 83; //s key
 
-
-let hull,debug;
-
+let hull, debug;
 let colors = {};
 
 document.addEventListener("alpine:init", () => {
@@ -25,7 +23,7 @@ document.addEventListener("alpine:init", () => {
 function setup() {
   colorMode(HSL);
   createCanvas(windowWidth, windowHeight);
-  noStroke()
+  noStroke();
   colors.base = color(240, 8, 75);
   colors.overlap = color(0, 100, 50, 0.2);
   colors.selected = color(240, 8, 0, 0.2);
@@ -36,17 +34,17 @@ function setup() {
 function draw() {
   getInput();
   background(240, 2, 95);
-  data.selectedRock && data.selectedRock.move();
   // draw base rock
   data.rocks.forEach((item) => {
-    fill(color(hue(colors.base),saturation(colors.base),item.lightness));
+    fill(color(hue(colors.base), saturation(colors.base), item.lightness));
     item.draw();
-    item.updateSpeckles()
+    item.updateSpeckles();
   });
-
+  // draw selected rock
   if (data.selectedRock) {
     fill(colors.selected);
     data.selectedRock.draw();
+    // draw overlapping rocks
     let overlapping = data.selectedRock.checkOverlap(data.rocks);
     if (overlapping) {
       fill(colors.overlap);
@@ -58,21 +56,28 @@ function draw() {
   debug.update();
 }
 
+function mouseMoved(){
+  data.selectedRock && data.selectedRock.move();
+
+}
+
+
 function mousePressed() {
   if (data.selectedRock) {
     // if not overlapping another, drop
-    data.selectedRock.checkOverlap(data.rocks) ? collideRock() : placeRock();
+    if(!data.selectedRock.checkOverlap(data.rocks)){
+      placeRock()
+    }
   } else {
     // if mouse is over a polygon, select that polygon
-    for (let rock of data.rocks) {
-      if ( rock.collidePoint(createVector(mouseX,mouseY))){
+    for (let [id,rock] of data.rocks) {
+      if (rock.collidePoint(createVector(mouseX, mouseY))) {
         data.selectedRock = rock;
         break;
       }
     }
   }
 }
-
 
 function mouseWheel(event) {
   if (!data.selectedRock) return false;
@@ -93,10 +98,6 @@ function getInput() {
   if (keyIsDown(68)) {
     data.selectedRock && data.selectedRock.rotate(keyIsDown(KEY_FINE) ? KEY_ROTATION_FINE : KEY_ROTATION);
   }
-}
-
-function collideRock() {
-  random(clicks).play();
 }
 
 function placeRock() {

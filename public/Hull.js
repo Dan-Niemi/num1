@@ -41,8 +41,8 @@ class Hull {
   }
   update(rocks) {
     this.allPoints = [];
-    for (let rock of rocks) {
-      for (point of rock.points) {
+    for (let rock of rocks.values()) {
+      for (point of rock.globalPoints) {
         this.allPoints.push(createVector(point.x, point.y));
       }
     }
@@ -60,12 +60,9 @@ class Hull {
       stroke(0, 100, 50);
       strokeWeight(4);
       beginShape();
-      hull.hullPoints.forEach((point) => vertex(point.x, point.y));
+      this.hullPoints.forEach((point) => vertex(point.x, point.y));
       endShape(CLOSE);
       pop();
     }
-  }
-  static test(){
-    console.log('testing')
   }
 }

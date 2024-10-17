@@ -4,7 +4,7 @@ const socket = new PartySocket({
   host: PARTYKIT_HOST,
   room: "my-new-room",
 });
-
+window.socket = socket;
 socket.onopen = (event) => {
   console.log("Connection opened");
 };
@@ -23,7 +23,10 @@ socket.onmessage = (event) => {
     case "cursorInit":
       Alpine.store("data").cursors = new Map(Object.entries(data.cursors));
       Alpine.store("data").id = data.id;
-      Alpine.store("data").rocks = data.gameData.rocks.map((r) => new Rock(r));
+      let rockMap = new Map(
+        data.gameData.rocks.map(r=>[r.id,new Rock(r)])
+      )
+      Alpine.store("data").rocks = rockMap;
       updateCursors();
       break;
     case "cursorUpdate":
@@ -37,6 +40,16 @@ socket.onmessage = (event) => {
     case "chat":
       displayChatMessage(data.id, data.message);
       break;
+      case "rockUpdate":
+      let movedRock = Alpine.store("data").rocks.get(data.id);
+      movedRock.pos = createVector(data.pos.x,data.pos.y);
+      movedRock.rot = data.rot
+      movedRock.updateGlobalPoints()
+      console.log(`
+        pos:(${movedRock.pos.x} ${movedRock.pos.y})
+        rot:(${movedRock.rot}
+        `)
+        
   }
 };
 

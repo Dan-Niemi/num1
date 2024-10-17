@@ -8,7 +8,9 @@ class Debug{
 	}
 	get polyArea(){
 		if (data.rocks){
-			return data.rocks.map((rock) => rock.area).reduce((a, b) => a + b, 0)
+			let total = 0
+			data.rocks.forEach((val) => total+=val.area)
+			return total
 		}
 		
 	}

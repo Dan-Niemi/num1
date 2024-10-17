@@ -15,12 +15,14 @@ let gameData = {
 
 
 class Rock {
-  constructor(pos) {
+  constructor(pos,id) {
     this.numPoints = DN.randomInt(POINTS_MIN, POINTS_MAX);
     this.rad = DN.random(RAD_MIN, RAD_MAX);
     this.radMax = RAD_MAX;
     this.points = [];
     this.pos = pos;
+    this.rot = 0;
+    this.id = id;
     for (let i = 0; i < this.numPoints; i++) {
       this.points.push(DN.Vector2.random().multiply(this.rad));
     }
@@ -51,7 +53,7 @@ function addRocks() {
   let failedAttempts = 0;
   for (let i = 0; i < NUM_ROCKS; i++) {
     let pos = new DN.Vector2(DN.random(RAD_MAX, BOARD_SIZE - RAD_MAX), DN.random(RAD_MAX, BOARD_SIZE - RAD_MAX));
-    let newRock = new Rock(pos);
+    let newRock = new Rock(pos,i);
     if (!newRock.checkOverlap(gameData.rocks)) {
       gameData.rocks.push(newRock);
     } else {
