@@ -17,7 +17,7 @@ class PartyServer {
     );
     this.cursors.set(conn.id, { x: 0, y: 0 });
     const existingCursors = Object.fromEntries(this.cursors);
-    conn.send(JSON.stringify({ type: "cursorInit", cursors: existingCursors, id: conn.id, gameData: gameData }));
+    conn.send(JSON.stringify({ type: "connection", cursors: existingCursors, id: conn.id, gameData: gameData }));
   }
 
   onMessage(message, sender) {

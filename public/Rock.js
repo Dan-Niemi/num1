@@ -2,7 +2,7 @@ class Rock {
   constructor(data) {
     this.pos = createVector(data.pos.x, data.pos.y);
     this.points = data.points.map((p) => createVector(p.x, p.y));
-    this.rot = 0;
+    this.rot = data.rot || 0;
     this.rad = data.rad;
     this.radMax = data.radMax;
     this.updateGlobalPoints();

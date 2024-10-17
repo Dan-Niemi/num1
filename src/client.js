@@ -8,7 +8,6 @@ window.socket = socket;
 socket.onopen = (event) => {
   console.log("Connection opened");
 };
-
 socket.onclose = (event) => {
   console.log("Connection closed");
 };
@@ -19,37 +18,31 @@ socket.onerror = (error) => {
 
 socket.onmessage = (event) => {
   const data = JSON.parse(event.data);
+  const store = Alpine.store("data");
   switch (data.type) {
-    case "cursorInit":
-      Alpine.store("data").cursors = new Map(Object.entries(data.cursors));
-      Alpine.store("data").id = data.id;
-      let rockMap = new Map(
-        data.gameData.rocks.map(r=>[r.id,new Rock(r)])
-      )
-      Alpine.store("data").rocks = rockMap;
+    case "connection":
+      store.cursors = new Map(Object.entries(data.cursors));
+      store.id = data.id;
+      let rockMap = new Map(data.gameData.rocks.map((r) => [r.id, new Rock(r)]));
+      store.rocks = rockMap;
       updateCursors();
       break;
     case "cursorUpdate":
-      Alpine.store("data").cursors.set(data.id, data.position);
+      store.cursors.set(data.id, data.position);
       updateCursors();
       break;
     case "cursorRemove":
-      Alpine.store("data").cursors.delete(data.id);
+      store.cursors.delete(data.id);
       updateCursors();
       break;
     case "chat":
       displayChatMessage(data.id, data.message);
       break;
-      case "rockUpdate":
-      let movedRock = Alpine.store("data").rocks.get(data.id);
-      movedRock.pos = createVector(data.pos.x,data.pos.y);
-      movedRock.rot = data.rot
-      movedRock.updateGlobalPoints()
-      console.log(`
-        pos:(${movedRock.pos.x} ${movedRock.pos.y})
-        rot:(${movedRock.rot}
-        `)
-        
+    case "rockUpdate":
+      let movedRock = store.rocks.get(data.id);
+      movedRock.pos = createVector(data.pos.x, data.pos.y);
+      movedRock.rot = data.rot;
+      movedRock.updateGlobalPoints();
   }
 };
 
