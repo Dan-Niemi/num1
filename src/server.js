@@ -1,12 +1,11 @@
-import * as gameData from "../GameData.json";
+import boardSetup from "../boardSetup.js";
 
-const rocks = new Map(gameData.rocks.map((r) => [r.id, r]));
 class PartyServer {
   constructor(room) {
     this.room = room;
     this.cursors = new Map();
-    this.seed = "dan";
-    this.rocks = rocks;
+    this.board = boardSetup(12)
+    this.rocks = new Map(this.board.rocks.map((r) => [r.id, r]));
   }
   onConnect(conn, ctx) {
     console.log(
@@ -17,7 +16,7 @@ class PartyServer {
     );
     this.cursors.set(conn.id, { x: 0, y: 0 });
     const existingCursors = Object.fromEntries(this.cursors);
-    conn.send(JSON.stringify({ type: "connection", cursors: existingCursors, id: conn.id, gameData: gameData }));
+    conn.send(JSON.stringify({ type: "connection", cursors: existingCursors, id: conn.id, gameData: this.board }));
   }
 
   onMessage(message, sender) {
@@ -27,8 +26,8 @@ class PartyServer {
       this.broadcastCursorUpdate(sender.id, data.position);
     }
     if (data.type === "rockUpdate") {
-      rocks.get(data.id).pos = data.pos;
-      rocks.get(data.id).rot = data.rot;
+      this.rocks.get(data.id).pos = data.pos;
+      this.rocks.get(data.id).rot = data.rot;
       this.room.broadcast(
         JSON.stringify({
           type: "rockUpdate",
