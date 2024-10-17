@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PartyKit Chat Rooms</title>
+  </head>
+  <body>
+    <div id="app">
+      <form id="roomForm">
+        <input type="text" id="roomName" placeholder="Enter room name" />
+        <button type="submit">Join Room</button>
+      </form>
+      <div id="chatRoom" style="display: none">
+        <h2 id="roomTitle"></h2>
+        <ul id="messages"></ul>
+        <form id="messageForm">
+          <input type="text" id="messageInput" placeholder="Type a message" />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/partysocket@0.0.8/dist/index.js"></script>
+  </body>
+</html>
