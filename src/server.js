@@ -1,7 +1,11 @@
+import * as gameData from "../GameData.json";
+
+
 class PartyServer {
   constructor(room) {
     this.room = room;
     this.cursors = new Map();
+    this.seed = "dan";
   }
 
   onConnect(conn, ctx) {
@@ -11,14 +15,13 @@ class PartyServer {
         room: ${this.room.id}
         url: ${new URL(ctx.request.url).pathname}`
     );
-    this.cursors.set(conn.id, {x:0,y:0});
+    this.cursors.set(conn.id, { x: 0, y: 0 });
     const existingCursors = Object.fromEntries(this.cursors);
-    conn.send(JSON.stringify({ type: "cursorInit", cursors: existingCursors, id:conn.id }));
+    conn.send(JSON.stringify({ type: "cursorInit", cursors: existingCursors, id: conn.id, gameData: gameData }));
   }
 
   onMessage(message, sender) {
     const data = JSON.parse(message);
-    
     if (data.type === "cursor") {
       this.cursors.set(sender.id, data.position);
       this.broadcastCursorUpdate(sender.id, data.position);

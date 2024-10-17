@@ -21,16 +21,17 @@ socket.onmessage = (event) => {
   const data = JSON.parse(event.data);
   switch (data.type) {
     case "cursorInit":
-      Alpine.store('data').cursors = new Map(Object.entries(data.cursors));
-      Alpine.store('data').id = data.id;
+      Alpine.store("data").cursors = new Map(Object.entries(data.cursors));
+      Alpine.store("data").id = data.id;
+      Alpine.store("data").rocks = data.gameData.rocks.map((r) => new Rock(r));
       updateCursors();
       break;
     case "cursorUpdate":
-      Alpine.store('data').cursors.set(data.id, data.position)
+      Alpine.store("data").cursors.set(data.id, data.position);
       updateCursors();
       break;
     case "cursorRemove":
-      Alpine.store('data').cursors.delete(data.id);
+      Alpine.store("data").cursors.delete(data.id);
       updateCursors();
       break;
     case "chat":
@@ -44,12 +45,9 @@ document.addEventListener("mousemove", (event) => {
   socket.send(JSON.stringify({ type: "cursor", position: cursor }));
 });
 
-
-
-
 function createCursor(id) {
-  const cursor = document.createElement('div');
-  cursor.className = 'cursor';
+  const cursor = document.createElement("div");
+  cursor.className = "cursor";
   cursor.id = `cursor-${id}`;
   document.body.appendChild(cursor);
   return cursor;
@@ -69,7 +67,4 @@ function removeCursor(id) {
   }
 }
 
-
-function updateCursors() {
-}
-
+function updateCursors() {}

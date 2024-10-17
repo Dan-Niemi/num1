@@ -27,15 +27,12 @@
       <div class="debug"></div>
       <div class="control">
         <label>Show Hull<input type="checkbox" onclick="hull.toggle(event)" /></label>
-        <label>Rotate from click position<input type="checkbox" onclick="rotateClickPos = !rotateClickPos" /></label>
-        <label>Click and drag<input type="checkbox" onclick="dragMode = !dragMode" /></label>
-        <button onclick="addRocks(5)">More Rocks</button>
       </div>
     </div>
     <div class="cursors">
       <template x-for="arr in [...$store.data.cursors]">
         <template x-if="arr[0] != $store.data.id">
-          <div class="cursor" :style="`position:absolute;translate: ${arr[1].x}px ${arr[1].y}px `">
+          <div class="cursor" :style="`pointer-events: none; position:absolute;translate: ${arr[1].x}px ${arr[1].y}px `">
             <span x-text="`(${arr[1].x},${arr[1].y})`"></span>
           </div>
         </template>

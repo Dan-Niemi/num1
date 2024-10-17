@@ -7,7 +7,10 @@ class Debug{
 		this.update();
 	}
 	get polyArea(){
-		return polygons.map((poly) => poly.area).reduce((a, b) => a + b, 0)
+		if (data.rocks){
+			return data.rocks.map((rock) => rock.area).reduce((a, b) => a + b, 0)
+		}
+		
 	}
 	update(){
 		this.polyAreaEl.textContent = `Poly Area: ${Math.round(this.polyArea / 1000)}`

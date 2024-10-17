@@ -1,8 +1,8 @@
 class Hull {
-  constructor(polygons = []) {
+  constructor(rocks = []) {
     this.allPoints = [];
     this.show = false;
-    this.update(polygons);
+    this.update(rocks);
   }
 
   get area() {
@@ -39,10 +39,10 @@ class Hull {
     lower.pop();
     return lower.concat(upper);
   }
-  update(polygons) {
+  update(rocks) {
     this.allPoints = [];
-    for (let poly of polygons) {
-      for (point of poly.vertices) {
+    for (let rock of rocks) {
+      for (point of rock.points) {
         this.allPoints.push(createVector(point.x, point.y));
       }
     }
@@ -55,14 +55,17 @@ class Hull {
   }
   draw() {
     if (this.show) {
-      push()
+      push();
       noFill();
-      stroke(0, 100, 100);
+      stroke(0, 100, 50);
       strokeWeight(4);
       beginShape();
       hull.hullPoints.forEach((point) => vertex(point.x, point.y));
       endShape(CLOSE);
-      pop()
+      pop();
     }
+  }
+  static test(){
+    console.log('testing')
   }
 }
