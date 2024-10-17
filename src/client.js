@@ -2,7 +2,8 @@ import PartySocket from "partysocket";
 
 const socket = new PartySocket({
   host: PARTYKIT_HOST,
-  room: "my-new-room",
+  room: "sample-room",
+  // room: Math.random(),
 });
 window.socket = socket;
 socket.onopen = (event) => {

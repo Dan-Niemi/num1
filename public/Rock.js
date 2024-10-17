@@ -79,7 +79,7 @@ class Rock {
   }
   move() {
     let mouseDelta = createVector(mouseX - pmouseX, mouseY - pmouseY);
-    this.pos = p5.Vector.add(this.pos, mouseDelta);
+    this.pos = p5.Vector.add(this.pos, mouseDelta); 
     this.updateGlobalPoints();
     socket.send(
       JSON.stringify({

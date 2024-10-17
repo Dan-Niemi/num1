@@ -58,9 +58,7 @@ function draw() {
 
 function mouseMoved(){
   data.selectedRock && data.selectedRock.move();
-
 }
-
 
 function mousePressed() {
   if (data.selectedRock) {
