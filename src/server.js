@@ -1,4 +1,4 @@
-import boardSetup from "../boardSetup.js";
+import boardSetup from "./boardSetup.js";
 
 class PartyServer {
   constructor(room) {
