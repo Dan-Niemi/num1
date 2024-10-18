@@ -90,9 +90,11 @@ class Rock {
 
   drawSpeckles() {
     this.g.colorMode(HSL);
-    for (let i = 0; i < 100; i++) {
-      this.g.fill(240, random(10), random(50), random(0.03));
-      this.g.ellipse(random(this.g.width), random(this.g.height), random(50), random(50));
+    for (let i = 0; i < 200; i++) {
+      this.g.fill(240, random(20), random(50), random(0.02));
+      this.g.ellipse(random(this.g.width), random(this.g.height), random(60), random(60));
+      this.g.fill(240, random(20), random(50), random(0.2));
+      this.g.ellipse(random(this.g.width), random(this.g.height), random(5), random(5));
     }
   }
   move() {

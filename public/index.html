@@ -6,38 +6,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>rocks</title>
     <!-- STYLES -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
+    <!-- TAILWIND -->
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
     <!-- P5 -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"></script>
     <script defer src="https://unpkg.com/p5.collide2d"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.min.js"></script>
     <!-- ALPINE -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>    
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- PARTYKIT -->
     <script type="module" src="/dist/client.js"></script>
     <!-- CLASSES -->
-     <script src="./Rock.js"></script>
-     <script src="./Hull.js"></script>
-     <script src="./Debug.js"></script>
-     <!-- Easing -->
-      <script  src="./bezier-easing.js"></script>
+    <script src="./Rock.js"></script>
+    <script src="./Hull.js"></script>
+    <script src="./Debug.js"></script>
+    <!-- Easing -->
+    <script src="./bezier-easing.js"></script>
     <!-- APP -->
     <script src="./app.js"></script>
   </head>
-  <body x-data>
+  <body x-data class="overflow-hidden">
     <!-- SIDEBAR -->
-    <div x-show="$store.data.state === 1" class="sidebar">
+    <div x-cloak x-show="$store.data.gameStarted" class="sidebar">
+      <ul style="padding-left: 1rem;">
+        <li>Click rock to select/place</li>
+        <li>Mouse wheel or <strong>A</strong> and <strong>D</strong> to rotate</li>
+        <li>Hold <strong>S</strong> for fine movement</li>
+        <li>Try to arrange all rocks in the smallest area</li>
+      </ul>
       <div class="debug"></div>
       <div class="control">
         <label>Show Hull<input type="checkbox" onclick="hull.toggle(event)" /></label>
       </div>
     </div>
-    <!-- START BUTTON -->
-     <button style="position:absolute" x-show="!$store.data.gameStarted" @click="$store.data.beginGame()">Begin</button>
-
-
-
-
+    <!-- OPEN SCREEN -->
+    <!-- <div x-show="!$store.data.gameStarted" class="opening flex items-center justify-center h-screen">
+      <button  @click="$store.data.beginGame()">Begin</button>
+    </div> -->
 
     <div class="cursors">
       <template x-for="arr in [...$store.data.cursors]">
@@ -48,7 +55,5 @@
         </template>
       </template>
     </div>
-
-
   </body>
 </html>

@@ -26,6 +26,7 @@ socket.onmessage = (event) => {
       store.id = data.id;
       store.cursors = new Map(Object.entries(data.cursors));
       store.rocks = new Map(data.gameData.rocks.map((r) => [r.id, new Rock(r)]));
+      store.beginGame()
       break;
     case "cursorUpdate":
       store.cursors.set(data.id, data.position);
