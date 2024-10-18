@@ -19,16 +19,26 @@
      <script src="./Rock.js"></script>
      <script src="./Hull.js"></script>
      <script src="./Debug.js"></script>
+     <!-- Easing -->
+      <script  src="./bezier-easing.js"></script>
     <!-- APP -->
     <script src="./app.js"></script>
   </head>
   <body x-data>
-    <div class="sidebar">
+    <!-- SIDEBAR -->
+    <div x-show="$store.data.state === 1" class="sidebar">
       <div class="debug"></div>
       <div class="control">
         <label>Show Hull<input type="checkbox" onclick="hull.toggle(event)" /></label>
       </div>
     </div>
+    <!-- START BUTTON -->
+     <button style="position:absolute" x-show="!$store.data.gameStarted" @click="$store.data.beginGame()">Begin</button>
+
+
+
+
+
     <div class="cursors">
       <template x-for="arr in [...$store.data.cursors]">
         <template x-if="arr[0] != $store.data.id">
@@ -38,5 +48,7 @@
         </template>
       </template>
     </div>
+
+
   </body>
 </html>

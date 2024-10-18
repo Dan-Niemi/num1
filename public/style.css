@@ -15,3 +15,4 @@ p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
 .control,.debug {display: flex;flex-direction: column;gap: .25rem; } 
 .control label,.debug label {display: flex;gap: 1rem; } 
 
+body{background-color: hsl(240, 2%, 95%);}

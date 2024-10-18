@@ -10,7 +10,9 @@ class Rock {
     this.g = createGraphics(this.radMax * 2, this.radMax * 2);
     this.g.noStroke();
     this.drawSpeckles();
+    colorMode(HSL)
     this.lightness = random(70, 85);
+    this.color = color(240,8,this.lightness)
   }
 
   get area() {
@@ -58,6 +60,22 @@ class Rock {
     beginShape();
     this.globalPoints.forEach((p) => vertex(p.x, p.y));
     endShape(CLOSE);
+  }
+  animate(progress = 0){
+    push()
+    translate(this.pos)
+    rotate(this.rot)
+    scale(progress*1)
+    beginShape();
+    this.points.forEach((p) => {vertex(p.x, p.y)});
+    endShape(CLOSE);
+    beginClip();
+    beginShape();
+    this.points.forEach((p) => {vertex(p.x, p.y)});
+    endShape(CLOSE);
+    endClip()
+    image(this.g, -this.rad, -this.rad);
+    pop()
   }
   updateSpeckles() {
     push();
