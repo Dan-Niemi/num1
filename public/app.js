@@ -4,7 +4,7 @@ const MOUSE_ROTATION = 0.003;
 const MOUSE_ROTATION_FINE = 0.0005;
 const KEY_FINE = 83; //s key
 
-const dnEase = BezierEasing(0.25,0.1,0.0,1.5);
+const dnEase = BezierEasing(0.25, 0.1, 0.0, 1.5);
 
 let hull, debug;
 let colors = {};
@@ -26,7 +26,7 @@ document.addEventListener("alpine:init", () => {
     beginGame() {
       this.gameStarted = true;
       this.animStartTime = Date.now();
-      this.animEndTime = this.animStartTime + this.animDur  + this.animStagger * this.rocks.size;
+      this.animEndTime = this.animStartTime + this.animDur + this.animStagger * this.rocks.size;
     },
   });
   window.data = Alpine.store("data");
@@ -44,17 +44,22 @@ function setup() {
 }
 
 function draw() {
-  if(!data.gameStarted){return}
+  if (!data.gameStarted) {
+    return;
+  }
   let dur = Date.now() - data.animStartTime;
-  if (data.animStartTime + dur < data.animEndTime){
+  if (data.animStartTime + dur < data.animEndTime) {
     background(240, 2, 95);
     data.rocks.forEach((rock, index) => {
-      let progress = constrain((dur - data.animStagger * index) / data.animDur,0,1)
-      let eased = dnEase(progress)
+      let progress = constrain((dur - data.animStagger * index) / data.animDur, 0, 1);
+      let eased = dnEase(progress);
       fill(rock.color);
       rock.animate(eased);
     });
-  }else{
+  } else {
+    if (mouseX !== pmouseX || mouseY !== pmouseY ) {
+      data.selectedRock && data.selectedRock.move()
+    }
     getInput();
     background(240, 2, 95);
     // draw base rock
@@ -77,12 +82,6 @@ function draw() {
     hull.draw();
     debug.update();
   }
-
-
-}
-
-function mouseMoved() {
-  data.selectedRock && data.selectedRock.move();
 }
 
 function mousePressed() {

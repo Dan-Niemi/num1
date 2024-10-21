@@ -6,13 +6,13 @@ class Rock {
     this.rad = data.rad;
     this.radMax = data.radMax;
     this.updateGlobalPoints();
-    this.id = data.id
+    this.id = data.id;
     this.g = createGraphics(this.radMax * 2, this.radMax * 2);
     this.g.noStroke();
     this.drawSpeckles();
-    colorMode(HSL)
+    colorMode(HSL);
     this.lightness = random(70, 85);
-    this.color = color(240,8,this.lightness)
+    this.color = color(240, 8, this.lightness);
   }
 
   get area() {
@@ -25,6 +25,9 @@ class Rock {
       area -= p[j].x * p[i].y;
     }
     return Math.abs(area) / 2;
+  }
+  get center() {
+    return this.points.reduce((a, b) => p5.Vector.add(a, b)).div(this.points.length);
   }
 
   collidePoint(mouseVec) {
@@ -61,28 +64,19 @@ class Rock {
     this.globalPoints.forEach((p) => vertex(p.x, p.y));
     endShape(CLOSE);
   }
-  animate(progress = 0){
-    push()
-    translate(this.pos)
-    rotate(this.rot)
-    scale(progress*1)
-    beginShape();
-    this.points.forEach((p) => {vertex(p.x, p.y)});
-    endShape(CLOSE);
-    beginClip();
-    beginShape();
-    this.points.forEach((p) => {vertex(p.x, p.y)});
-    endShape(CLOSE);
-    endClip()
-    image(this.g, -this.rad, -this.rad);
-    pop()
+  animate(progress = 0) {
+    let scale = progress * 1;
+    this.updateGlobalPoints(scale);
+    this.draw();
+    this.updateSpeckles(scale);
   }
-  updateSpeckles() {
-    push();
+  updateSpeckles(s = 1) {
+    push()
     beginClip();
     this.draw();
     endClip();
     translate(this.pos);
+    scale(s);
     rotate(this.rot);
     image(this.g, -this.rad, -this.rad);
     pop();
@@ -99,14 +93,14 @@ class Rock {
   }
   move() {
     let mouseDelta = createVector(mouseX - pmouseX, mouseY - pmouseY);
-    this.pos = p5.Vector.add(this.pos, mouseDelta); 
+    this.pos = p5.Vector.add(this.pos, mouseDelta);
     this.updateGlobalPoints();
     socket.send(
       JSON.stringify({
         type: "rockUpdate",
         pos: this.pos,
         rot: this.rot,
-        id: this.id
+        id: this.id,
       })
     );
   }
@@ -119,13 +113,13 @@ class Rock {
         type: "rockUpdate",
         pos: this.pos,
         rot: this.rot,
-        id: this.id
+        id: this.id,
       })
     );
   }
 
-  updateGlobalPoints() {
-    this.globalPoints = this.points.map((p) => p5.Vector.rotate(p, this.rot).add(this.pos));
+  updateGlobalPoints(scale = 1) {
+    let c = this.center;
+    this.globalPoints = this.points.map((p) => p5.Vector.sub(p, c).rotate(this.rot).mult(scale).add(this.pos).add(c));
   }
-  
 }
