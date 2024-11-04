@@ -13,6 +13,7 @@ class Rock {
     colorMode(HSL);
     this.lightness = random(70, 85);
     this.color = color(240, 8, this.lightness);
+    
   }
 
   get area() {
@@ -59,27 +60,29 @@ class Rock {
     return res.length ? [...new Set(res)] : false;
   }
 
-  draw() {
+  draw(s = 1) {
     beginShape();
     this.globalPoints.forEach((p) => vertex(p.x, p.y));
     endShape(CLOSE);
+    // Do Speckles
+    push()
+    beginClip();
+    beginShape();
+    this.globalPoints.forEach((p) => vertex(p.x, p.y));
+    endShape(CLOSE);
+    endClip();
+    let c = this.center
+    translate(c.add(this.pos));
+    scale(s);
+    rotate(this.rot);
+    image(this.g, -this.radMax, -this.radMax);
+    pop();
+    
   }
   animate(progress = 0) {
     let scale = progress * 1;
     this.updateGlobalPoints(scale);
-    this.draw();
-    this.updateSpeckles(scale);
-  }
-  updateSpeckles(s = 1) {
-    push()
-    beginClip();
-    this.draw();
-    endClip();
-    translate(this.pos);
-    scale(s);
-    rotate(this.rot);
-    image(this.g, -this.rad, -this.rad);
-    pop();
+    this.draw(scale);    
   }
 
   drawSpeckles() {

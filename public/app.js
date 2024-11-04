@@ -44,10 +44,9 @@ function setup() {
 }
 
 function draw() {
-  if (!data.gameStarted) {
-    return;
-  }
+  if (!data.gameStarted) {return;}
   let dur = Date.now() - data.animStartTime;
+// For opening animation
   if (data.animStartTime + dur < data.animEndTime) {
     background(240, 2, 95);
     data.rocks.forEach((rock, index) => {
@@ -56,6 +55,7 @@ function draw() {
       fill(rock.color);
       rock.animate(eased);
     });
+// for Main game
   } else {
     if (mouseX !== pmouseX || mouseY !== pmouseY ) {
       data.selectedRock && data.selectedRock.move()
@@ -66,7 +66,6 @@ function draw() {
     data.rocks.forEach((rock) => {
       fill(rock.color);
       rock.draw();
-      rock.updateSpeckles();
     });
     // draw selected rock
     if (data.selectedRock) {
