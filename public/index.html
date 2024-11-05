@@ -26,7 +26,7 @@
     <!-- APP -->
     <script src="./app.js"></script>
   </head>
-  <body x-data >
+  <body x-data>
     <!-- SIDEBAR -->
     <div x-cloak x-show="$store.data.gameStarted" class="sidebar">
       <ul style="padding-left: 1rem;">
@@ -42,7 +42,8 @@
     </div>
     <!-- OPEN SCREEN -->
     <div x-show="!$store.data.gameStarted" class="opening flex items-center justify-center h-screen">
-      <button  @click="$store.data.beginGame()">Begin</button>
+      <label>Room name: <input x-model="$store.data.room" type="text"></label>
+      <button @click="$store.data.beginGame()">Join room</button>
     </div>
 
     <div class="cursors">

@@ -11,9 +11,10 @@ let colors = {};
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
+    room: null,
     cursors: new Map(),
     rocks: new Map(),
-    id: null,
+    playerID: null,
     selectedRock: null,
     gameStarted: false,
     animStartTime: null,
@@ -24,9 +25,11 @@ document.addEventListener("alpine:init", () => {
       console.log("alpine store running");
     },
     beginGame() {
+      connectToRoom(this.room)
       this.gameStarted = true;
       this.animStartTime = Date.now();
       this.animEndTime = this.animStartTime + this.animDur + this.animStagger * this.rocks.size;
+  
     },
   });
   window.data = Alpine.store("data");

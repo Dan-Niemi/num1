@@ -1,11 +1,14 @@
-import boardSetup from "./boardSetup.js";
-
 class PartyServer {
   constructor(room) {
+    this.boardSize = 800;
+    this.rockCounter = 0;
     this.room = room;
     this.cursors = new Map();
-    this.board = boardSetup(12)
-    this.rocks = new Map(this.board.rocks.map((r) => [r.id, r]));
+    this.rocks = new Map();
+    for (let i = 0; i < 10; i++) {
+      let p = { x: Math.random() * this.boardSize, y: Math.random() * this.boardSize }
+      this.rocks.set(this.rockCounter++, this.newRock(p))
+    }
   }
   onConnect(conn, ctx) {
     console.log(
@@ -16,7 +19,7 @@ class PartyServer {
     );
     this.cursors.set(conn.id, { x: 0, y: 0 });
     const existingCursors = Object.fromEntries(this.cursors);
-    conn.send(JSON.stringify({ type: "connection", cursors: existingCursors, id: conn.id, gameData: this.board }));
+    conn.send(JSON.stringify({ type: "connection", cursors: existingCursors, id: conn.id, rocks: [...this.rocks] }));
   }
 
   onMessage(message, sender) {
@@ -46,7 +49,7 @@ class PartyServer {
         type: "cursorRemove",
         id: conn.id,
       })
-    );
+    ); ``
   }
 
   broadcastCursorUpdate(id, position) {
@@ -59,6 +62,31 @@ class PartyServer {
       [id]
     );
   }
+  newRock(pos) {
+    const RADMIN = 30
+    const RADMAX = 200
+    const POINTSMIN = 5
+    const POINTSMAX = 12
+    let points = []
+    let numPoints = Math.random() * (POINTSMAX - POINTSMIN) + POINTSMIN;
+    let rad = Math.random() * (RADMAX - RADMIN) + RADMIN;
+    // make points    
+    for (let j = 0; j < numPoints; j++) {
+      let angle = Math.random() * Math.PI * 2
+      let xPos = Math.cos(angle) * rad
+      let yPos = Math.sin(angle) * rad
+      points.push({ x: xPos, y: yPos })
+
+    }
+    // Find the center point
+    const cx = points.reduce((sum, b) => sum + b.x, 0) / points.length;
+    const cy = points.reduce((sum, b) => sum + b.y, 0) / points.length;
+    // Sort Clockwise
+    points.sort((a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx))
+    return { pos: pos, points: points, rad: rad, radMax: RADMAX }
+  }
 }
 
 export default PartyServer;
+
+

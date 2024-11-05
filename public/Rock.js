@@ -1,16 +1,16 @@
 class Rock {
-  constructor(data) {
+  constructor(id,data) {
     this.pos = createVector(data.pos.x, data.pos.y);
     this.points = data.points.map((p) => createVector(p.x, p.y));
     this.rot = data.rot || 0;
     this.rad = data.rad;
     this.radMax = data.radMax;
     this.updateGlobalPoints();
-    this.id = data.id;
+    this.id = id;
+    colorMode(HSL);
     this.g = createGraphics(this.radMax * 2, this.radMax * 2);
     this.g.noStroke();
     this.drawSpeckles();
-    colorMode(HSL);
     this.lightness = random(70, 85);
     this.color = color(240, 8, this.lightness);
     
@@ -107,7 +107,6 @@ class Rock {
       })
     );
   }
-
   rotate(angle) {
     this.rot += angle;
     this.updateGlobalPoints();
@@ -120,7 +119,6 @@ class Rock {
       })
     );
   }
-
   updateGlobalPoints(scale = 1) {
     let c = this.center;
     this.globalPoints = this.points.map((p) => p5.Vector.sub(p, c).rotate(this.rot).mult(scale).add(this.pos).add(c));
