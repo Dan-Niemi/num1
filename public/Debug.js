@@ -7,9 +7,9 @@ class Debug{
 		this.update();
 	}
 	get polyArea(){
-		if (data.rocks){
+		if (store.rocks){
 			let total = 0
-			data.rocks.forEach((val) => total+=val.area)
+			store.rocks.forEach((val) => total+=val.area)
 			return total
 		}
 		

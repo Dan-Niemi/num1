@@ -1,13 +1,16 @@
-const KEY_ROTATION = 0.1;
-const KEY_ROTATION_FINE = 0.01;
-const MOUSE_ROTATION = 0.003;
-const MOUSE_ROTATION_FINE = 0.0005;
-const KEY_FINE = 83; //s key
+const KEYS = {}
+const COLORS = {};
+const SETTINGS = {
+  rotSpeed: 0.1,
+  rotSpeedWheel: 0.002,
+  //multiplier for fine control
+  get mult() {
+    return KEYS["s"] ? 0.1 : 1;
+  },
+};
 
-// const dnEase = BezierEasing(0.25, 0.1, 0.0, 1.5);
+let hull, debug, mousePrev;
 
-let hull, debug;
-let colors = {};
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
@@ -17,95 +20,135 @@ document.addEventListener("alpine:init", () => {
     playerId: null,
     selectedRock: null,
     gameStarted: false,
-    init() {
-      console.log("alpine store running");
-    },
     beginGame() {
       connectToRoom(this.room)
       this.gameStarted = true;
-      
     },
+    deleteRock(id) {
+      socket.send(
+        JSON.stringify({
+          type: "deleteRock",
+          id: id,
+        })
+      );
+    },
+    addRock(pos) {
+      socket.send(
+        JSON.stringify({
+          type: "addRock",
+          pos: pos,
+        })
+      );
+
+    }
   });
-  window.data = Alpine.store("data");
+  window.store = Alpine.store("data");
 });
 
 function setup() {
   colorMode(HSL);
   createCanvas(windowWidth, windowHeight);
   noStroke();
-  colors.base = color(240, 8, 75);
-  colors.overlap = color(0, 100, 50, 0.2);
-  colors.selected = color(240, 8, 0, 0.2);
-  hull = new Hull(data.rocks);
+  COLORS.base = color(240, 8, 75);
+  COLORS.overlap = color(0, 100, 50, 0.2);
+  COLORS.selected = color(240, 8, 0, 0.2);
+  hull = new Hull(store.rocks);
   debug = new Debug(document.querySelector(".debug"));
+  document.addEventListener("keydown", e => KEYS[e.key] = true);
+  document.addEventListener("keyup", e => KEYS[e.key] = false);
+  document.addEventListener("mousedown", e => KEYS["m" + e.button] = true);
+  document.addEventListener("mouseup", e => { KEYS["m" + e.button] = false; canvasGrabbed = false });
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("mousedown", e => { handleMouseDown(e) });
+  document.addEventListener("mousemove", e => { handleMouseMove(e) });
+  document.addEventListener("wheel", e => { handleWheel(e) }, { passive: false });
+  window.addEventListener('resize', e => resizeCanvas(windowWidth, windowHeight))
 
 }
 
 function draw() {
-  if (mouseX !== pmouseX || mouseY !== pmouseY) {
-    data.selectedRock && data.selectedRock.move()
-  }
   getInput();
   background(240, 2, 95);
   // draw base rock
-  data.rocks.forEach((rock) => {
-    fill(rock.color);
-    rock.draw();
-  });
+  store.rocks.forEach(rock => rock.draw(rock.color));
   // draw selected rock
-  if (data.selectedRock) {
-    fill(colors.selected);
-    data.selectedRock.draw();
+  if (store.selectedRock) {
+    store.selectedRock.draw(COLORS.selected);
     // draw overlapping rocks
-    let overlapping = data.selectedRock.checkOverlap(data.rocks);
+    let overlapping = store.selectedRock.checkOverlap(store.rocks);
     if (overlapping) {
-      fill(colors.overlap);
-      overlapping.forEach((rock) => rock.draw());
+      overlapping.forEach(rock => rock.draw(COLORS.overlap));
     }
   }
   hull.draw();
   debug.update();
 }
 
-function mousePressed() {
-  if (data.selectedRock) {
-    // if not overlapping another, drop
-    if (!data.selectedRock.checkOverlap(data.rocks)) {
-      placeRock();
+
+
+function getInput() {
+  if (store.selectedRock) {
+    if (KEYS["a"]) {
+      store.selectedRock.rotate(-SETTINGS.rotSpeed * SETTINGS.mult);
     }
-  } else {
-    // if mouse is over a polygon, select that polygon
-    for (let [id, rock] of data.rocks) {
-      if (rock.collidePoint(createVector(mouseX, mouseY))) {
-        data.selectedRock = rock;
-        break;
+    if (KEYS["d"]) {
+      store.selectedRock.rotate(SETTINGS.rotSpeed * SETTINGS.mult);
+    }
+  }
+}
+
+
+function placeRock() {
+  store.selectedRock = null;
+  hull.update(store.rocks);
+}
+
+
+
+
+function handleWheel(e) {
+  e.preventDefault();
+  if (store.selectedRock) { store.selectedRock.rotate(e.deltaY * SETTINGS.rotSpeedWheel * SETTINGS.mult); }
+
+}
+function handleMouseMove(e) {
+  let delta = createVector(e.clientX, e.clientY).sub(mousePrev);
+  if (store.selectedRock) {
+    store.selectedRock.move(delta);
+  }
+  mousePrev = createVector(e.clientX, e.clientY);
+}
+
+function handleMouseDown(e) {
+  if (e.button == 0) {
+    if (store.selectedRock) {
+      // PLACE ROCK
+      if (!store.selectedRock.checkOverlap(store.rocks)) {
+        store.selectedRock = null;
+        return;
+      }
+    }
+    if (!store.selectedRock) {
+      // PICK ROCK
+      for (let rock of store.rocks.values()) {
+        if (rock.collidePoint(createVector(mouseX, mouseY))) {
+          store.selectedRock = rock;
+          return;
+        }
       }
     }
   }
-}
-
-function mouseWheel(event) {
-  if (!data.selectedRock) return false;
-  const MAX_SPEED = 200;
-  let angle = constrain(event.delta, -MAX_SPEED, MAX_SPEED);
-  data.selectedRock.rotate(angle * (keyIsDown(KEY_FINE) ? MOUSE_ROTATION_FINE : MOUSE_ROTATION));
-  return false;
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
-function getInput() {
-  if (keyIsDown(65)) {
-    data.selectedRock && data.selectedRock.rotate(keyIsDown(KEY_FINE) ? -KEY_ROTATION_FINE : -KEY_ROTATION);
+  if (e.button == 2) {
+    // DELETE ROCK IF CLICKED
+    if (!store.selectedRock) {
+      for (let [id, rock] of store.rocks) {
+        if (rock.collidePoint(createVector(mouseX, mouseY))) {
+          store.deleteRock(id)
+          return;
+        }
+      }
+      // OTHERWISE ADD NEW ROCK IF NO ROCK CLICKED
+      store.addRock(createVector(mouseX, mouseY))
+    }
   }
-  if (keyIsDown(68)) {
-    data.selectedRock && data.selectedRock.rotate(keyIsDown(KEY_FINE) ? KEY_ROTATION_FINE : KEY_ROTATION);
-  }
-}
-
-function placeRock() {
-  data.selectedRock = null;
-  hull.update(data.rocks);
 }
