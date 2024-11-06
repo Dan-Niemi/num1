@@ -4,7 +4,7 @@ const MOUSE_ROTATION = 0.003;
 const MOUSE_ROTATION_FINE = 0.0005;
 const KEY_FINE = 83; //s key
 
-const dnEase = BezierEasing(0.25, 0.1, 0.0, 1.5);
+// const dnEase = BezierEasing(0.25, 0.1, 0.0, 1.5);
 
 let hull, debug;
 let colors = {};
@@ -14,22 +14,16 @@ document.addEventListener("alpine:init", () => {
     room: null,
     cursors: new Map(),
     rocks: new Map(),
-    playerID: null,
+    playerId: null,
     selectedRock: null,
     gameStarted: false,
-    animStartTime: null,
-    animEndTime: null,
-    animDur: 400,
-    animStagger: 50,
     init() {
       console.log("alpine store running");
     },
     beginGame() {
       connectToRoom(this.room)
       this.gameStarted = true;
-      this.animStartTime = Date.now();
-      this.animEndTime = this.animStartTime + this.animDur + this.animStagger * this.rocks.size;
-  
+      
     },
   });
   window.data = Alpine.store("data");
@@ -44,46 +38,33 @@ function setup() {
   colors.selected = color(240, 8, 0, 0.2);
   hull = new Hull(data.rocks);
   debug = new Debug(document.querySelector(".debug"));
+
 }
 
 function draw() {
-  if (!data.gameStarted) {return;}
-  let dur = Date.now() - data.animStartTime;
-// For opening animation
-  if (data.animStartTime + dur < data.animEndTime) {
-    background(240, 2, 95);
-    data.rocks.forEach((rock, index) => {
-      let progress = constrain((dur - data.animStagger * index) / data.animDur, 0, 1);
-      let eased = dnEase(progress);
-      fill(rock.color);
-      rock.animate(eased);
-    });
-// for Main game
-  } else {
-    if (mouseX !== pmouseX || mouseY !== pmouseY ) {
-      data.selectedRock && data.selectedRock.move()
-    }
-    getInput();
-    background(240, 2, 95);
-    // draw base rock
-    data.rocks.forEach((rock) => {
-      fill(rock.color);
-      rock.draw();
-    });
-    // draw selected rock
-    if (data.selectedRock) {
-      fill(colors.selected);
-      data.selectedRock.draw();
-      // draw overlapping rocks
-      let overlapping = data.selectedRock.checkOverlap(data.rocks);
-      if (overlapping) {
-        fill(colors.overlap);
-        overlapping.forEach((rock) => rock.draw());
-      }
-    }
-    hull.draw();
-    debug.update();
+  if (mouseX !== pmouseX || mouseY !== pmouseY) {
+    data.selectedRock && data.selectedRock.move()
   }
+  getInput();
+  background(240, 2, 95);
+  // draw base rock
+  data.rocks.forEach((rock) => {
+    fill(rock.color);
+    rock.draw();
+  });
+  // draw selected rock
+  if (data.selectedRock) {
+    fill(colors.selected);
+    data.selectedRock.draw();
+    // draw overlapping rocks
+    let overlapping = data.selectedRock.checkOverlap(data.rocks);
+    if (overlapping) {
+      fill(colors.overlap);
+      overlapping.forEach((rock) => rock.draw());
+    }
+  }
+  hull.draw();
+  debug.update();
 }
 
 function mousePressed() {

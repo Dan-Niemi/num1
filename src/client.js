@@ -13,7 +13,7 @@ window.connectToRoom = (roomName) => {
     const store = Alpine.store("data");
     switch (data.type) {
       case "connection":
-        store.playerID = data.id;
+        store.id = data.id;
         store.cursors = new Map(Object.entries(data.cursors));
         console.log(data.rocks)
         store.rocks = new Map(data.rocks.map(([key,obj]) => [key, new Rock(key,obj)]));

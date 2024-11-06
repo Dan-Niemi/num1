@@ -1,19 +1,35 @@
+
 class Rock {
-  constructor(id,data) {
-    this.pos = createVector(data.pos.x, data.pos.y);
+  constructor(id, data) {
+    this.animStartTime = Date.now();
+    this.animDuration = 300;
     this.points = data.points.map((p) => createVector(p.x, p.y));
+    this.animEasing = BezierEasing(0.25, 0.1, 0.0, 1.5) //using bezier-easing library
+    this.pos = createVector(data.pos.x, data.pos.y);
     this.rot = data.rot || 0;
+    this.scale = 0
     this.rad = data.rad;
-    this.radMax = data.radMax;
-    this.updateGlobalPoints();
     this.id = id;
+    this.updateGlobalPoints()
+    // DRAWING
     colorMode(HSL);
-    this.g = createGraphics(this.radMax * 2, this.radMax * 2);
-    this.g.noStroke();
-    this.drawSpeckles();
     this.lightness = random(70, 85);
     this.color = color(240, 8, this.lightness);
-    
+    this.g = createGraphics(this.rad * 2, this.rad * 2);
+    this.g.colorMode(HSL);
+    this.g.noStroke();
+    this.createSpeckles();
+
+
+    let animStart = setInterval(() => {
+      let progress = (Date.now() - this.animStartTime) / this.animDuration;
+      this.scale = this.animEasing(progress)
+      this.updateGlobalPoints()
+    }, 16.67);
+    setTimeout(() => {
+      clearInterval(animStart);
+      this.scale = 1;
+    }, this.animDuration);
   }
 
   get area() {
@@ -59,34 +75,29 @@ class Rock {
     }
     return res.length ? [...new Set(res)] : false;
   }
-
-  draw(s = 1) {
+  makeShape(){
     beginShape();
     this.globalPoints.forEach((p) => vertex(p.x, p.y));
     endShape(CLOSE);
-    // Do Speckles
+  }
+
+  draw() {
+    this.makeShape()
+    // speckles
     push()
     beginClip();
-    beginShape();
-    this.globalPoints.forEach((p) => vertex(p.x, p.y));
-    endShape(CLOSE);
+    this.makeShape()
     endClip();
     let c = this.center
     translate(c.add(this.pos));
-    scale(s);
+    scale(this.scale);
     rotate(this.rot);
-    image(this.g, -this.radMax, -this.radMax);
+    imageMode(CENTER)
+    image(this.g, 0, 0);
     pop();
-    
-  }
-  animate(progress = 0) {
-    let scale = progress * 1;
-    this.updateGlobalPoints(scale);
-    this.draw(scale);    
   }
 
-  drawSpeckles() {
-    this.g.colorMode(HSL);
+  createSpeckles() {
     for (let i = 0; i < 200; i++) {
       this.g.fill(240, random(20), random(50), random(0.02));
       this.g.ellipse(random(this.g.width), random(this.g.height), random(60), random(60));
@@ -119,8 +130,8 @@ class Rock {
       })
     );
   }
-  updateGlobalPoints(scale = 1) {
+  updateGlobalPoints() {
     let c = this.center;
-    this.globalPoints = this.points.map((p) => p5.Vector.sub(p, c).rotate(this.rot).mult(scale).add(this.pos).add(c));
+    this.globalPoints = this.points.map((p) => p5.Vector.sub(p, c).rotate(this.rot).mult(this.scale).add(this.pos).add(c));
   }
 }
