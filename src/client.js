@@ -15,6 +15,7 @@ window.connectToRoom = (roomName) => {
         store.id = data.id;
         store.cursors = new Map(Object.entries(data.cursors));
         store.rocks = new Map(Object.entries(data.rocks).map(([key,rock]) => [key,new Rock(rock)]))
+        store.rooms = data.rooms
         break;
       case "cursorUpdate":
         store.cursors.set(data.id, data.position);

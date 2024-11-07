@@ -1,27 +1,36 @@
+const rooms = []
+
+const BOARDSIZE = 800
+
+
 class PartyServer {
   constructor(room) {
-    this.boardSize = 800;
+    // this.boardSize = 800;
     this.rockCounter = 0;
     this.room = room;
+    rooms.push(this.room.id)
     this.cursors = new Map();
     this.rocks = new Map();
     for (let i = 0; i < 10; i++) {
-      let p = { x: Math.random() * this.boardSize, y: Math.random() * this.boardSize }
+      let p = { x: Math.random() * BOARDSIZE, y: Math.random() * BOARDSIZE }
       let id = 'rock' + this.rockCounter++
-      this.rocks.set(id, this.newRock(id,p))
+      this.rocks.set(id, this.newRock(id, p))
     }
   }
   onConnect(conn, ctx) {
-    console.log(
-      `Connected:
-        id: ${conn.id}
-        room: ${this.room.id}
-        url: ${new URL(ctx.request.url).pathname}`
-    );
     this.cursors.set(conn.id, { x: 0, y: 0 });
     const cursorsObj = Object.fromEntries(this.cursors);
     const rocksObj = Object.fromEntries(this.rocks)
-    conn.send(JSON.stringify({ type: "connection",room:this.room, cursors: cursorsObj, id: conn.id, rocks: rocksObj }));
+    let o = { 
+      type: "connection", 
+      room: this.room.id, 
+      rooms: rooms, 
+      cursors: cursorsObj, 
+      id: conn.id, 
+      rocks: rocksObj 
+    }
+    
+    conn.send(JSON.stringify(o));
   }
 
   onMessage(message, sender) {
@@ -43,7 +52,7 @@ class PartyServer {
         [sender.id]
       );
     }
-    if (data.type === "deleteRock"){
+    if (data.type === "deleteRock") {
       this.rocks.delete(data.id)
       this.room.broadcast(
         JSON.stringify({
@@ -52,10 +61,9 @@ class PartyServer {
         })
       )
     }
-    if (data.type === "addRock"){
+    if (data.type === "addRock") {
       let id = this.rockCounter++
-      this.rocks.set(id,this.newRock(id,data.pos))
-      console.log(this.rocks)
+      this.rocks.set(id, this.newRock(id, data.pos))
       this.room.broadcast(
         JSON.stringify({
           type: "addRock",
@@ -64,8 +72,6 @@ class PartyServer {
       )
     }
   }
-
-
 
   onClose(conn) {
     this.cursors.delete(conn.id);
@@ -87,7 +93,7 @@ class PartyServer {
       [id]
     );
   }
-  newRock(id,pos) {
+  newRock(id, pos) {
     const RADMIN = 30
     const RADMAX = 200
     const POINTSMIN = 5
@@ -109,7 +115,7 @@ class PartyServer {
     const cy = points.reduce((sum, b) => sum + b.y, 0) / points.length;
     // Sort Clockwise
     points.sort((a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx))
-    return { pos: pos, points: points, rad: rad, radMax: RADMAX,id:id }
+    return { pos: pos, points: points, rad: rad, radMax: RADMAX, id: id }
   }
 }
 
