@@ -9,14 +9,17 @@ const SETTINGS = {
   },
 };
 
-let hull, debug, mousePrev;
+
 
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
+    // debug: null,
     room: null,
     cursors: new Map(),
     rocks: new Map(),
+    hull: null,
+    mousePrev: null,
     playerId: null,
     selectedRock: null,
     gameStarted: false,
@@ -46,14 +49,13 @@ document.addEventListener("alpine:init", () => {
 });
 
 function setup() {
+  // store.debug = new Debug(document.querySelector(".debug"));
   colorMode(HSL);
   createCanvas(windowWidth, windowHeight);
   noStroke();
   COLORS.base = color(240, 8, 75);
   COLORS.overlap = color(0, 100, 50, 0.2);
   COLORS.selected = color(240, 8, 0, 0.2);
-  hull = new Hull(store.rocks);
-  debug = new Debug(document.querySelector(".debug"));
   document.addEventListener("keydown", e => KEYS[e.key] = true);
   document.addEventListener("keyup", e => KEYS[e.key] = false);
   document.addEventListener("mousedown", e => KEYS["m" + e.button] = true);
@@ -80,10 +82,10 @@ function draw() {
       overlapping.forEach(rock => rock.draw(COLORS.overlap));
     }
   }
-  hull.draw();
-  debug.update();
+  if (store.hull){
+    store.hull.draw();
+  }
 }
-
 
 
 function getInput() {
@@ -97,14 +99,10 @@ function getInput() {
   }
 }
 
-
 function placeRock() {
   store.selectedRock = null;
-  hull.update(store.rocks);
+  store.hull.update(store.rocks);
 }
-
-
-
 
 function handleWheel(e) {
   e.preventDefault();
@@ -112,11 +110,11 @@ function handleWheel(e) {
 
 }
 function handleMouseMove(e) {
-  let delta = createVector(e.clientX, e.clientY).sub(mousePrev);
+  let delta = createVector(e.clientX, e.clientY).sub(store.mousePrev);
   if (store.selectedRock) {
     store.selectedRock.move(delta);
   }
-  mousePrev = createVector(e.clientX, e.clientY);
+  store.mousePrev = createVector(e.clientX, e.clientY);
 }
 
 function handleMouseDown(e) {
@@ -124,7 +122,7 @@ function handleMouseDown(e) {
     if (store.selectedRock) {
       // PLACE ROCK
       if (!store.selectedRock.checkOverlap(store.rocks)) {
-        store.selectedRock = null;
+        placeRock()
         return;
       }
     }

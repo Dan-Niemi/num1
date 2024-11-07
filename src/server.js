@@ -1,6 +1,10 @@
 const rooms = []
 
 const BOARDSIZE = 800
+const RADMIN = 20
+const RADMAX = 120
+const POINTSMIN = 5
+const POINTSMAX = 12
 
 class PartyServer {
   constructor(room) {
@@ -91,10 +95,6 @@ class PartyServer {
     );
   }
   newRock(id, pos) {
-    const RADMIN = 30
-    const RADMAX = 200
-    const POINTSMIN = 5
-    const POINTSMAX = 12
     this.id = id
     let points = []
     let numPoints = Math.random() * (POINTSMAX - POINTSMIN) + POINTSMIN;
@@ -105,7 +105,6 @@ class PartyServer {
       let xPos = Math.cos(angle) * rad
       let yPos = Math.sin(angle) * rad
       points.push({ x: xPos, y: yPos })
-
     }
     // Find the center point
     const cx = points.reduce((sum, b) => sum + b.x, 0) / points.length;

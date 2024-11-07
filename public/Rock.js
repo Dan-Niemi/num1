@@ -7,6 +7,7 @@ class Rock {
     this.scale = 0
     this.rad = data.rad;
     this.id = data.id;
+    this.globalPoints = [],
     this.updateGlobalPoints()
     
     // DRAWING
@@ -27,6 +28,9 @@ class Rock {
       let progress = (Date.now() - this.animStartTime) / this.animDuration;
       this.scale = this.animEasing(progress)
       this.updateGlobalPoints()
+      if (store.hull){
+       store.hull.update(store.rocks) 
+      }
     }, 16.67);
     setTimeout(() => {
       clearInterval(animStart);
