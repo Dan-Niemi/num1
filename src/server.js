@@ -2,10 +2,8 @@ const rooms = []
 
 const BOARDSIZE = 800
 
-
 class PartyServer {
   constructor(room) {
-    // this.boardSize = 800;
     this.rockCounter = 0;
     this.room = room;
     rooms.push(this.room.id)
@@ -29,7 +27,6 @@ class PartyServer {
       id: conn.id, 
       rocks: rocksObj 
     }
-    
     conn.send(JSON.stringify(o));
   }
 

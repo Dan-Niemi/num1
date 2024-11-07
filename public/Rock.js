@@ -4,7 +4,6 @@ class Rock {
     this.points = data.points.map((p) => createVector(p.x, p.y));
     this.pos = createVector(data.pos.x, data.pos.y);
     this.rot = data.rot || 0;
-    
     this.scale = 0
     this.rad = data.rad;
     this.id = data.id;
