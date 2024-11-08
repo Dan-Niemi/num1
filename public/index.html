@@ -27,6 +27,11 @@
     <script src="./app.js"></script>
   </head>
   <body x-data>
+    <!-- OPEN SCREEN -->
+    <div x-show="!$store.data.gameStarted" class="opening flex items-center justify-center h-screen">
+      <label>Room name: <input x-model="$store.data.room" type="text" /></label>
+      <button @click="$store.data.beginGame()">Join room</button>
+    </div>
     <!-- SIDEBAR -->
     <div x-cloak x-show="$store.data.gameStarted" class="sidebar">
       <ul style="padding-left: 1rem">
@@ -45,11 +50,6 @@
       <div class="control">
         <label>Show Hull<input type="checkbox" @click="$store.data.hull.toggle(event)" /></label>
       </div>
-    </div>
-    <!-- OPEN SCREEN -->
-    <div x-show="!$store.data.gameStarted" class="opening flex items-center justify-center h-screen">
-      <label>Room name: <input x-model="$store.data.room" type="text" /></label>
-      <button @click="$store.data.beginGame()">Join room</button>
     </div>
 
     <div class="cursors">

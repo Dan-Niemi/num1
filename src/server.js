@@ -1,4 +1,4 @@
-const rooms = [] //room IDs
+let rooms = [] //room IDs
 const BOARDSIZE = 800
 const RADMIN = 20
 const RADMAX = 120
@@ -21,36 +21,41 @@ class PartyServer {
   }
   onConnect(conn, _ctx) {
     this.cursors.push({ id: conn.id, pos: { x: 0, y: 0 } });
-    conn.send(JSON.stringify({ type: "connection", id: conn.id, rooms: rooms, cursors: this.cursors, rocks: this.rocks }));
+    conn.send(JSON.stringify({ type: "connectionID", id: conn.id,rocks: this.rocks }));
+    this.room.broadcast(JSON.stringify({ type: "connection", rooms: rooms, cursors: this.cursors }));
   }
 
   onMessage(message, sender) {
     const data = JSON.parse(message);
-    if (data.type === "cursor") {
-      let c = this.cursors.find(cursor => cursor.id = sender.id)
+    if (data.type === "cursorUpdate") {
+      let c = this.cursors.find(cursor => cursor.id === sender.id)
       c.pos = data.pos
-      this.room.broadcast(JSON.stringify({ type: "cursorUpdate", id: sender.id, pos: data.pos}), [sender.id]);
+      this.room.broadcast(JSON.stringify({ type: "cursorUpdate", id: sender.id, pos: data.pos }), [sender.id]);
     }
     if (data.type === "updateRock") {
       let r = this.rocks.find(rock => rock.id === data.id)
       r.pos = data.pos;
       r.rot = data.rot;
-      this.room.broadcast( JSON.stringify({ type: "updateRock", pos: data.pos, rot: data.rot, id: data.id, }), [sender.id] );
+      this.room.broadcast(JSON.stringify({ type: "updateRock", pos: data.pos, rot: data.rot, id: data.id, }), [sender.id]);
     }
     if (data.type === "deleteRock") {
       this.rocks = this.rocks.filter(rock => rock.id !== data.id)
-      this.room.broadcast( JSON.stringify({ type: "deleteRock", id: data.id }) )
+      this.room.broadcast(JSON.stringify({ type: "deleteRock", id: data.id }))
     }
     if (data.type === "addRock") {
       let id = this.rockCounter++
       let r = this.newRock(id, data.pos)
       this.rocks.push(r)
-      this.room.broadcast( JSON.stringify({ type: "addRock", rock: r }) )
+      this.room.broadcast(JSON.stringify({ type: "addRock", rock: r }))
     }
   }
   onClose(conn) {
     this.cursors = this.cursors.filter(cursor => cursor.id !== conn.id)
-    this.room.broadcast(JSON.stringify({ type: "cursorRemove", id: conn.id, }));
+    this.room.broadcast(JSON.stringify({ type: "cursorRemove", cursors: this.cursors, }));
+    if([...this.room.getConnections()].length<1){
+      rooms = rooms.filter(room => room !== this.room)
+    }
+
   }
 
 

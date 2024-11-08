@@ -11,28 +11,30 @@ window.connectToRoom = (roomName) => {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     switch (data.type) {
-      case "connection":
+      case "connectionID":
         store.id = data.id;
-        store.cursors = data.cursors;
         store.rocks = data.rocks.map(rock => new Rock(rock))
+        break
+      case "connection":
+        store.cursors = data.cursors;
         store.hull = new Hull(store.rocks)
         store.rooms = data.rooms
         break;
       case "cursorUpdate":
-        let c = store.cursors.find(cursor=>cursor.id === data.id)
+        let c = store.cursors.find(cursor => cursor.id === data.id)
         c.pos = data.pos
         break;
       case "cursorRemove":
-        store.cursors = store.cursors.filter(cursor=>cursor.id !== data.id)
+        store.cursors = data.cursors
         break;
       case "updateRock":
-        let movedRock = store.rocks.find(rock=>rock.id === data.id)
+        let movedRock = store.rocks.find(rock => rock.id === data.id)
         movedRock.pos = createVector(data.pos.x, data.pos.y);
         movedRock.rot = data.rot;
         movedRock.updateGlobalPoints();
         break;
       case "deleteRock":
-        store.rocks = store.rocks.filter(rock=>rock.id !== data.id)
+        store.rocks = store.rocks.filter(rock => rock.id !== data.id)
         break;
       case "addRock":
         store.rocks.push(new Rock(data.rock))
@@ -40,7 +42,7 @@ window.connectToRoom = (roomName) => {
   };
   window.socket = socket
   document.addEventListener("mousemove", (event) => {
-    socket.send(JSON.stringify({ type: "cursor", pos: { x: event.clientX, y: event.clientY } }));
+    socket.send(JSON.stringify({ type: "cursorUpdate", pos: { x: event.clientX, y: event.clientY } }));
   });
 
 }
