@@ -1,5 +1,4 @@
 const rooms = []
-
 const BOARDSIZE = 800
 const RADMIN = 20
 const RADMAX = 120

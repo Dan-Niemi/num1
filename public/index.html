@@ -29,20 +29,26 @@
   <body x-data>
     <!-- SIDEBAR -->
     <div x-cloak x-show="$store.data.gameStarted" class="sidebar">
-      <ul style="padding-left: 1rem;">
+      <ul style="padding-left: 1rem">
         <li>Click rock to select/place</li>
         <li>Mouse wheel or <strong>A</strong> and <strong>D</strong> to rotate</li>
         <li>Hold <strong>S</strong> for fine movement</li>
         <li>Try to arrange all rocks in the smallest area</li>
       </ul>
-      <div class="debug"></div>
+      <template x-if="store.gameStarted && store.hull">
+        <div  x-data="{get polyArea(){ return [...$store.data.rocks.values()].reduce((tot,rock) => tot + rock.area,0)}}" class="debug">
+          <div x-text=" polyArea && `Rock Area:${Math.round(polyArea / 1000)}`"></div>
+          <div x-text=" $store.data.hull && `Container Area:${Math.round($store.data.hull.area / 1000)}`"></div>
+          <div x-text="`Score: ${((polyArea / $store.data.hull.area) * 100).toFixed(0)}%`"></div>
+        </div>
+      </template>
       <div class="control">
         <label>Show Hull<input type="checkbox" @click="$store.data.hull.toggle(event)" /></label>
       </div>
     </div>
     <!-- OPEN SCREEN -->
     <div x-show="!$store.data.gameStarted" class="opening flex items-center justify-center h-screen">
-      <label>Room name: <input x-model="$store.data.room" type="text"></label>
+      <label>Room name: <input x-model="$store.data.room" type="text" /></label>
       <button @click="$store.data.beginGame()">Join room</button>
     </div>
 
