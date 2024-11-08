@@ -1,19 +1,40 @@
 import PartySocket from "partysocket";
 
-window.connectToRoom = (roomName) => {
+const lobby = new PartySocket({
+  host: PARTYKIT_HOST,
+  party: "lobby",
+  room: "lobby",
+})
+
+
+lobby.onmessage = (event) =>{
+  const data = JSON.parse(event.data)
+  if(data.type === "lobbyID"){
+    store.id = data.id;
+    console.log('Got the id:' + store.id)
+  }
+  if(data.type ==="playerUpdate"){
+    store.players = data.players
+    console.log(`Player Update: ${data.players.length} players`)
+  }
+}
+
+window.connectToRoom = (room) => {
   let socket = new PartySocket({
     host: PARTYKIT_HOST,
-    room: roomName
+    room: room,
+    id: store.id
   })
+  lobby.send(JSON.stringify({ type: "playerUpdate", room: store.room }))
   socket.onopen = (event) => console.log("Connection opened");
   socket.onclose = (event) => console.log("Connection closed");
   socket.onerror = (error) => console.error("WebSocket error:", error);
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     switch (data.type) {
-      case "connectionID":
-        store.id = data.id;
+      case "connectionSelf":
         store.rocks = data.rocks.map(rock => new Rock(rock))
+        console.log(data.id,store.id)
         break
       case "connection":
         store.cursors = data.cursors;

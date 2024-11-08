@@ -18,10 +18,11 @@ class PartyServer {
       let id = 'rock' + this.rockCounter++
       this.rocks.push(this.newRock(id, p))
     }
+    
   }
   onConnect(conn, _ctx) {
     this.cursors.push({ id: conn.id, pos: { x: 0, y: 0 } });
-    conn.send(JSON.stringify({ type: "connectionID", id: conn.id,rocks: this.rocks }));
+    conn.send(JSON.stringify({ type: "connectionSelf", id: conn.id,rocks: this.rocks }));
     this.room.broadcast(JSON.stringify({ type: "connection", rooms: rooms, cursors: this.cursors }));
   }
 
@@ -48,6 +49,7 @@ class PartyServer {
       this.rocks.push(r)
       this.room.broadcast(JSON.stringify({ type: "addRock", rock: r }))
     }
+
   }
   onClose(conn) {
     this.cursors = this.cursors.filter(cursor => cursor.id !== conn.id)
@@ -78,6 +80,7 @@ class PartyServer {
     points.sort((a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx))
     return { pos: pos, points: points, rad: rad, radMax: RADMAX, id: id }
   }
+  
 }
 
 export default PartyServer;

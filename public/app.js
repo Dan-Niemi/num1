@@ -13,16 +13,19 @@ document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
     // debug: null,
     room: null,
+    roomInput:'',
+    players: [],
     cursors: [],
     rocks: [],
     hull: null,
     mousePrev: null,
     playerId: null,
     selectedRock: null,
-    gameStarted: false,
-    beginGame() {
+    
+    joinRoom() {
+      this.room = this.roomInput
       connectToRoom(this.room)
-      this.gameStarted = true;
+      this.roomInput = ''
     },
     deleteRock(rock) {
       socket.send(
@@ -39,16 +42,22 @@ document.addEventListener("alpine:init", () => {
           pos: pos,
         })
       );
-
+    },
+    leaveRoom(){
+      socket.close();
+      this.rocks = [];
+      this.hull = null;
+      this.room = null;
+      this.gameStarted = false;
     }
   });
   window.store = Alpine.store("data");
 });
 
 function setup() {
-  // store.debug = new Debug(document.querySelector(".debug"));
   colorMode(HSL);
-  createCanvas(windowWidth, windowHeight);
+  const c = createCanvas(windowWidth, windowHeight);
+  c.parent('canvasWrapper')
   noStroke();
   COLORS.base = color(240, 8, 75);
   COLORS.overlap = color(0, 100, 50, 0.2);
