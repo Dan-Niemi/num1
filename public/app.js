@@ -24,11 +24,11 @@ document.addEventListener("alpine:init", () => {
       connectToRoom(this.room)
       this.gameStarted = true;
     },
-    deleteRock(id) {
+    deleteRock(rock) {
       socket.send(
         JSON.stringify({
           type: "deleteRock",
-          id: id,
+          id: rock.id,
         })
       );
     },
@@ -79,7 +79,7 @@ function draw() {
       overlapping.forEach(rock => rock.draw(COLORS.overlap));
     }
   }
-  if (store.hull){
+  if (store.hull) {
     store.hull.draw();
   }
 }
@@ -125,7 +125,7 @@ function handleMouseDown(e) {
     }
     if (!store.selectedRock) {
       // PICK ROCK
-      for (let rock of store.rocks.values()) {
+      for (let rock of store.rocks) {
         if (rock.collidePoint(createVector(mouseX, mouseY))) {
           store.selectedRock = rock;
           return;
@@ -136,9 +136,9 @@ function handleMouseDown(e) {
   if (e.button == 2) {
     // DELETE ROCK IF CLICKED
     if (!store.selectedRock) {
-      for (let [id, rock] of store.rocks) {
+      for (let rock of store.rocks) {
         if (rock.collidePoint(createVector(mouseX, mouseY))) {
-          store.deleteRock(id)
+          store.deleteRock(rock)
           return;
         }
       }

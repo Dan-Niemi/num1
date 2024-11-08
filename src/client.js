@@ -14,7 +14,7 @@ window.connectToRoom = (roomName) => {
       case "connection":
         store.id = data.id;
         store.cursors = new Map(Object.entries(data.cursors));
-        store.rocks = new Map(Object.entries(data.rocks).map(([key,rock]) => [key,new Rock(rock)]))
+        store.rocks = data.rocks.map(rock => new Rock(rock))
         store.hull = new Hull(store.rocks)
         store.rooms = data.rooms
         break;
@@ -25,16 +25,16 @@ window.connectToRoom = (roomName) => {
         store.cursors.delete(data.id);
         break;
       case "updateRock":
-        let movedRock = store.rocks.get(data.id);
+        let movedRock = store.rocks.find(rock=>rock.id === data.id)
         movedRock.pos = createVector(data.pos.x, data.pos.y);
         movedRock.rot = data.rot;
         movedRock.updateGlobalPoints();
         break;
       case "deleteRock":
-        store.rocks.delete(data.id)
+        store.rocks = store.rocks.filter(rock=>rock.id !== data.id)
         break;
       case "addRock":
-        store.rocks.set(data.rock.id,new Rock(data.rock))
+        store.rocks.push(new Rock(data.rock))
     }
   };
   window.socket = socket

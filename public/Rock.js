@@ -8,8 +8,8 @@ class Rock {
     this.rad = data.rad;
     this.id = data.id;
     this.globalPoints = [],
-    this.updateGlobalPoints()
-    
+      this.updateGlobalPoints()
+
     // DRAWING
     colorMode(HSL);
     imageMode(CENTER)
@@ -19,7 +19,7 @@ class Rock {
     this.g.colorMode(HSL);
     this.g.noStroke();
     this.createSpeckles();
-    
+
     // ANIMATION
     this.animEasing = BezierEasing(0.25, 0.1, 0.0, 1.5) //using bezier-easing library
     this.animDuration = 300;
@@ -28,8 +28,8 @@ class Rock {
       let progress = (Date.now() - this.animStartTime) / this.animDuration;
       this.scale = this.animEasing(progress)
       this.updateGlobalPoints()
-      if (store.hull){
-       store.hull.update(store.rocks) 
+      if (store.hull) {
+        store.hull.update(store.rocks)
       }
     }, 16.67);
     setTimeout(() => {
@@ -58,26 +58,26 @@ class Rock {
   checkOverlap(rockArr) {
     // check for collision
     let res = [];
-    for (let [id, other] of rockArr) {
+    rockArr.forEach(other => {
       if (other !== this) {
         // if lines collide
         if (collidePolyPoly(this.globalPoints, other.globalPoints)) {
           res.push(...[this, other]);
         }
         // if this is entirely inside another
-        for (let point of this.globalPoints) {
+        this.globalPoints.forEach(point => {
           if (collidePointPoly(point.x, point.y, other.globalPoints)) {
             res.push(...[this, other]);
           }
-        }
+        })
         // if another is entirely inside this
-        for (let point of other.globalPoints) {
+        other.globalPoints.forEach(point => {
           if (collidePointPoly(point.x, point.y, this.globalPoints)) {
             res.push(...[this, other]);
           }
-        }
+        })
       }
-    }
+    })
     return res.length ? [...new Set(res)] : false;
   }
   draw(color) {
@@ -126,7 +126,7 @@ class Rock {
     let c = this.center;
     this.globalPoints = this.points.map((p) => p5.Vector.sub(p, c).rotate(this.rot).mult(this.scale).add(this.pos).add(c));
   }
-  updateServer(){
+  updateServer() {
     socket.send(
       JSON.stringify({
         type: "updateRock",

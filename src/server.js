@@ -1,4 +1,4 @@
-const rooms = []
+const rooms = [] //room IDs
 const BOARDSIZE = 800
 const RADMIN = 20
 const RADMAX = 120
@@ -11,24 +11,23 @@ class PartyServer {
     this.room = room;
     rooms.push(this.room.id)
     this.cursors = new Map();
-    this.rocks = new Map();
+    this.rocks = [];
     for (let i = 0; i < 10; i++) {
       let p = { x: Math.random() * BOARDSIZE, y: Math.random() * BOARDSIZE }
       let id = 'rock' + this.rockCounter++
-      this.rocks.set(id, this.newRock(id, p))
+      this.rocks.push(this.newRock(id, p))
     }
   }
-  onConnect(conn, ctx) {
+  onConnect(conn, _ctx) {
     this.cursors.set(conn.id, { x: 0, y: 0 });
     const cursorsObj = Object.fromEntries(this.cursors);
-    const rocksObj = Object.fromEntries(this.rocks)
-    let o = { 
-      type: "connection", 
-      room: this.room.id, 
-      rooms: rooms, 
-      cursors: cursorsObj, 
-      id: conn.id, 
-      rocks: rocksObj 
+    let o = {
+      type: "connection",
+      room: this.room.id,
+      rooms: rooms,
+      cursors: cursorsObj,
+      id: conn.id,
+      rocks: this.rocks
     }
     conn.send(JSON.stringify(o));
   }
@@ -40,8 +39,9 @@ class PartyServer {
       this.broadcastCursorUpdate(sender.id, data.position);
     }
     if (data.type === "updateRock") {
-      this.rocks.get(data.id).pos = data.pos;
-      this.rocks.get(data.id).rot = data.rot;
+      let r = this.rocks.find(rock => rock.id === data.id)
+      r.pos = data.pos;
+      r.rot = data.rot;
       this.room.broadcast(
         JSON.stringify({
           type: "updateRock",
@@ -53,7 +53,7 @@ class PartyServer {
       );
     }
     if (data.type === "deleteRock") {
-      this.rocks.delete(data.id)
+      this.rocks = this.rocks.filter(rock => rock.id !== data.id)
       this.room.broadcast(
         JSON.stringify({
           type: "deleteRock",
@@ -63,11 +63,12 @@ class PartyServer {
     }
     if (data.type === "addRock") {
       let id = this.rockCounter++
-      this.rocks.set(id, this.newRock(id, data.pos))
+      let r = this.newRock(id, data.pos)
+      this.rocks.push(r)
       this.room.broadcast(
         JSON.stringify({
           type: "addRock",
-          rock: this.rocks.get(id)
+          rock: r
         })
       )
     }
