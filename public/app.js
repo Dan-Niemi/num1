@@ -25,8 +25,7 @@ document.addEventListener("alpine:init", () => {
     selectedRock: null,
 
     joinRoom() {
-      this.room = this.roomInput
-      connectToRoom(this.room)
+      connectToRoom(this.roomInput)
       this.roomInput = ''
     },
     deleteRock(rock) {
@@ -37,11 +36,12 @@ document.addEventListener("alpine:init", () => {
     },
     leaveRoom() {
       socket.close();
+      console.log('leave room')
       this.rocks = [];
       this.cursors = [];
       this.hull = null;
       this.room = null;
-      this.gameStarted = false;
+      lobby.send(JSON.stringify({ type: "playerUpdate", room: this.room }))
     }
   });
   window.store = Alpine.store("data");
@@ -63,6 +63,7 @@ function setup() {
   document.addEventListener("mousedown", e => { handleMouseDown(e) });
   document.addEventListener("mousemove", e => { handleMouseMove(e) });
   document.addEventListener("wheel", e => { handleWheel(e) }, { passive: false });
+
   window.addEventListener('resize', e => resizeCanvas(windowWidth, windowHeight))
 }
 
@@ -112,6 +113,9 @@ function handleMouseMove(e) {
     store.selectedRock.move(delta);
   }
   store.mousePrev = createVector(e.clientX, e.clientY);
+  if (socket){
+    socket.send(JSON.stringify({ type: "cursorUpdate", pos: { x: e.clientX, y: e.clientY } }));
+  }
 }
 
 function handleMouseDown(e) {

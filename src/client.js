@@ -1,6 +1,6 @@
 import PartySocket from "partysocket";
-
-const lobby = new PartySocket({
+window.socket = null;
+window.lobby = new PartySocket({
   host: PARTYKIT_HOST,
   party: "lobby",
   room: "lobby",
@@ -13,17 +13,15 @@ lobby.onmessage = (event) =>{
   }
   if(data.type ==="playerUpdate"){
     store.players = data.players
-    
   }
 }
 
-window.connectToRoom = (room) => {
-  let socket = new PartySocket({
+window.connectToRoom = (roomString) => {
+  socket = new PartySocket({
     host: PARTYKIT_HOST,
-    room: room,
+    room: roomString,
     id: store.id
   })
-  lobby.send(JSON.stringify({ type: "playerUpdate", room: store.room }))
   socket.onopen = (event) => console.log("Connection opened");
   socket.onclose = (event) => console.log("Connection closed");
   socket.onerror = (error) => console.error("WebSocket error:", error);
@@ -32,7 +30,8 @@ window.connectToRoom = (room) => {
     switch (data.type) {
       case "connectionSelf":
         store.rocks = data.rocks.map(rock => new Rock(rock))
-        console.log(data.id,store.id)
+        store.room = data.room
+        lobby.send(JSON.stringify({ type: "playerUpdate", room: store.room }))
         break
       case "connection":
         store.cursors = data.cursors;
@@ -59,10 +58,5 @@ window.connectToRoom = (room) => {
         store.rocks.push(new Rock(data.rock))
     }
   };
-  window.socket = socket
-  document.addEventListener("mousemove", (event) => {
-    socket.send(JSON.stringify({ type: "cursorUpdate", pos: { x: event.clientX, y: event.clientY } }));
-  });
-
 }
 

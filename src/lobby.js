@@ -1,4 +1,5 @@
 let players = []
+let rooms = []
 
 class Lobby {
 	constructor(room) {

@@ -22,7 +22,7 @@ class PartyServer {
   }
   onConnect(conn, _ctx) {
     this.cursors.push({ id: conn.id, pos: { x: 0, y: 0 } });
-    conn.send(JSON.stringify({ type: "connectionSelf", id: conn.id,rocks: this.rocks }));
+    conn.send(JSON.stringify({ type: "connectionSelf", id: conn.id,rocks: this.rocks,room:this.room.id }));
     this.room.broadcast(JSON.stringify({ type: "connection", rooms: rooms, cursors: this.cursors }));
   }
 
