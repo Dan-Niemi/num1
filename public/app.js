@@ -11,41 +11,34 @@ const SETTINGS = {
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
-    // debug: null,
-    room: null,
-    roomInput:'',
+    // ui
+    roomInput: '',
+    // lobby scope
     players: [],
-    cursors: [],
+    id: null,
+    room: null,
+    // game scope
     rocks: [],
+    cursors: [],
     hull: null,
     mousePrev: null,
-    playerId: null,
     selectedRock: null,
-    
+
     joinRoom() {
       this.room = this.roomInput
       connectToRoom(this.room)
       this.roomInput = ''
     },
     deleteRock(rock) {
-      socket.send(
-        JSON.stringify({
-          type: "deleteRock",
-          id: rock.id,
-        })
-      );
+      socket.send(JSON.stringify({ type: "deleteRock", id: rock.id, }))
     },
     addRock(pos) {
-      socket.send(
-        JSON.stringify({
-          type: "addRock",
-          pos: pos,
-        })
-      );
+      socket.send(JSON.stringify({ type: "addRock", pos: pos, }));
     },
-    leaveRoom(){
+    leaveRoom() {
       socket.close();
       this.rocks = [];
+      this.cursors = [];
       this.hull = null;
       this.room = null;
       this.gameStarted = false;
@@ -71,7 +64,6 @@ function setup() {
   document.addEventListener("mousemove", e => { handleMouseMove(e) });
   document.addEventListener("wheel", e => { handleWheel(e) }, { passive: false });
   window.addEventListener('resize', e => resizeCanvas(windowWidth, windowHeight))
-
 }
 
 function draw() {
@@ -92,7 +84,6 @@ function draw() {
     store.hull.draw();
   }
 }
-
 
 function getInput() {
   if (store.selectedRock) {

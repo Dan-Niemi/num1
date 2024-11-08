@@ -6,16 +6,14 @@ const lobby = new PartySocket({
   room: "lobby",
 })
 
-
 lobby.onmessage = (event) =>{
   const data = JSON.parse(event.data)
   if(data.type === "lobbyID"){
     store.id = data.id;
-    console.log('Got the id:' + store.id)
   }
   if(data.type ==="playerUpdate"){
     store.players = data.players
-    console.log(`Player Update: ${data.players.length} players`)
+    
   }
 }
 
