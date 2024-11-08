@@ -13,16 +13,17 @@ window.connectToRoom = (roomName) => {
     switch (data.type) {
       case "connection":
         store.id = data.id;
-        store.cursors = new Map(Object.entries(data.cursors));
+        store.cursors = data.cursors;
         store.rocks = data.rocks.map(rock => new Rock(rock))
         store.hull = new Hull(store.rocks)
         store.rooms = data.rooms
         break;
       case "cursorUpdate":
-        store.cursors.set(data.id, data.position);
+        let c = store.cursors.find(cursor=>cursor.id === data.id)
+        c.pos = data.pos
         break;
       case "cursorRemove":
-        store.cursors.delete(data.id);
+        store.cursors = store.cursors.filter(cursor=>cursor.id !== data.id)
         break;
       case "updateRock":
         let movedRock = store.rocks.find(rock=>rock.id === data.id)
@@ -39,7 +40,7 @@ window.connectToRoom = (roomName) => {
   };
   window.socket = socket
   document.addEventListener("mousemove", (event) => {
-    socket.send(JSON.stringify({ type: "cursor", position: { x: event.clientX, y: event.clientY } }));
+    socket.send(JSON.stringify({ type: "cursor", pos: { x: event.clientX, y: event.clientY } }));
   });
 
 }

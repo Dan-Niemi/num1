@@ -36,7 +36,7 @@
         <li>Try to arrange all rocks in the smallest area</li>
       </ul>
       <template x-if="store.gameStarted && store.hull">
-        <div  x-data="{get polyArea(){ return [...$store.data.rocks.values()].reduce((tot,rock) => tot + rock.area,0)}}" class="debug">
+        <div x-data="{get polyArea(){ return $store.data.rocks.reduce((tot,rock) => tot + rock.area,0)}}" class="debug">
           <div x-text=" polyArea && `Rock Area:${Math.round(polyArea / 1000)}`"></div>
           <div x-text=" $store.data.hull && `Container Area:${Math.round($store.data.hull.area / 1000)}`"></div>
           <div x-text="`Score: ${((polyArea / $store.data.hull.area) * 100).toFixed(0)}%`"></div>
@@ -53,10 +53,10 @@
     </div>
 
     <div class="cursors">
-      <template x-for="arr in [...$store.data.cursors]">
-        <template x-if="arr[0] != $store.data.id">
-          <div class="cursor" :style="`pointer-events: none; position:absolute;translate: ${arr[1].x}px ${arr[1].y}px `">
-            <span x-text="`(${arr[1].x},${arr[1].y})`"></span>
+      <template x-for="cursor in $store.data.cursors">
+        <template x-if="cursor.id != $store.data.id">
+          <div class="cursor" :style="`pointer-events: none; position:absolute;translate: ${cursor.pos.x}px ${cursor.pos.y}px `">
+            <span x-text="`(${cursor.pos.x},${cursor.pos.y})`"></span>
           </div>
         </template>
       </template>

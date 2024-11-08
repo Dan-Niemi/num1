@@ -13,8 +13,8 @@ document.addEventListener("alpine:init", () => {
   Alpine.store("data", {
     // debug: null,
     room: null,
-    cursors: new Map(),
-    rocks: new Map(),
+    cursors: [],
+    rocks: [],
     hull: null,
     mousePrev: null,
     playerId: null,
