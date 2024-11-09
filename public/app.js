@@ -1,3 +1,4 @@
+window.p = null;
 const sketch = (p) => {
   let w, g;
   p.setup = () => {
@@ -79,7 +80,7 @@ const sketch = (p) => {
 const KEYS = {}
 const COLORS = {};
 const SETTINGS = {
-  rotSpeed: 0.1,
+  rotSpeed: 0.075,
   rotSpeedWheel: 0.002,
   //multiplier for fine control
   get mult() {
@@ -126,8 +127,7 @@ document.addEventListener("alpine:init", () => {
       this.room = data.room
       this.world.width = data.worldWidth
       this.world.height = data.worldHeight
-      this.sketchInstance = new p5(sketch, 'sketch-wrapper')
-      window.p = this.sketchInstance
+      window.p = new p5(sketch, 'sketch-wrapper')
       this.hull = new Hull(store.rocks)
     },
 
@@ -144,7 +144,8 @@ document.addEventListener("alpine:init", () => {
       this.cursors = [];
       this.hull = null;
       this.room = null;
-      this.sketchInstance.remove()
+      p.remove()
+      window.p = null
       lobby.send(JSON.stringify({ type: "playerUpdate", room: this.room }))
     }
   });
@@ -153,6 +154,7 @@ document.addEventListener("alpine:init", () => {
 
 
 function getInput() {
+  console.log(p.frameCount)
   if (store.selectedRock) {
     if (KEYS["a"]) {
       store.selectedRock.rotate(-SETTINGS.rotSpeed * SETTINGS.mult);
@@ -175,8 +177,8 @@ function handleWheel(e) {
   }
   if (!store.selectedRock) {
     // MOVE WINDOW
-    store.world.pos.x = p.constrain(store.world.pos.x + e.deltaX, 0, store.world.width - store.sketchInstance.width);
-    store.world.pos.y = p.constrain(store.world.pos.y + e.deltaY, 0, store.world.height - store.sketchInstance.height);
+    store.world.pos.x = p.constrain(store.world.pos.x + e.deltaX, 0, store.world.width - p.width);
+    store.world.pos.y = p.constrain(store.world.pos.y + e.deltaY, 0, store.world.height - p.height);
   }
 
 }
@@ -189,8 +191,8 @@ function handleMouseMove(e) {
   }else if (KEYS["m0"] && store.world.grabbed) {
     // MOVE WINDOW
     
-    store.world.pos.x = p.constrain(store.world.pos.x - delta.x, 0, store.world.width - store.sketchInstance.width);
-    store.world.pos.y = p.constrain(store.world.pos.y - delta.y, 0, store.world.height - store.sketchInstance.height);
+    store.world.pos.x = p.constrain(store.world.pos.x - delta.x, 0, store.world.width - p.width);
+    store.world.pos.y = p.constrain(store.world.pos.y - delta.y, 0, store.world.height - p.height);
   }
   store.mousePrev = new Vector2(e.clientX, e.clientY);
   if (socket) {
@@ -199,7 +201,7 @@ function handleMouseMove(e) {
 }
 
 function handleMouseDown(e) {
-  if (!store.sketchInstance) { return }
+  if (!p) { return }
   if (e.button == 0) {
     if (store.selectedRock) {
       // PLACE ROCK

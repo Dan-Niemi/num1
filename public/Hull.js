@@ -64,7 +64,7 @@ class Hull {
       canvas.strokeWeight(4);
       canvas.beginShape();
       this.hullPoints.forEach((point) => canvas.vertex(point.x, point.y));
-      canvas.endShape(store.sketchInstance.CLOSE);
+      canvas.endShape(p.CLOSE);
       canvas.pop();
     }
   }

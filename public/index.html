@@ -30,10 +30,10 @@
       <button @click="store.joinRoom()">Join room</button>
     </div>
     <!-- Player List -->
-    <div class="absolute">
+    <div class="absolute bottom-0 left-0 m-2">
       <ul>
         <template x-for="player in store.players" :key="player.id">
-          <li>
+          <li :class="player.id === store.id && 'font-bold'">
             <span x-text="player.id+': '"></span>
             <span x-text="player.room || 'lobby'"></span>
           </li>
