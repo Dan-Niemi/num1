@@ -31,11 +31,14 @@ window.connectToRoom = (roomString) => {
       case "connectionSelf":
         store.rocks = data.rocks.map(rock => new Rock(rock))
         store.room = data.room
+        store.world.width = data.worldWidth
+        store.world.height = data.worldHeight
+        store.sketchInstance = new p5(sketch, 'sketch-wrapper')
+        store.hull = new Hull(store.rocks)
         lobby.send(JSON.stringify({ type: "playerUpdate", room: store.room }))
         break
       case "connection":
         store.cursors = data.cursors;
-        store.hull = new Hull(store.rocks)
         store.rooms = data.rooms
         break;
       case "cursorUpdate":
@@ -47,7 +50,7 @@ window.connectToRoom = (roomString) => {
         break;
       case "updateRock":
         let movedRock = store.rocks.find(rock => rock.id === data.id)
-        movedRock.pos = createVector(data.pos.x, data.pos.y);
+        movedRock.pos = data.pos;
         movedRock.rot = data.rot;
         movedRock.updateGlobalPoints();
         break;

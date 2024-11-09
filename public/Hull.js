@@ -8,9 +8,9 @@ class Hull {
   }
   update(rocks) {
     this.allPoints = [];
-    for (let rock of rocks.values()) {
-      for (point of rock.globalPoints) {
-        this.allPoints.push(createVector(point.x, point.y));
+    for (let rock of rocks) {
+      for (let point of rock.globalPoints) {
+        this.allPoints.push(new Vector2(point.x, point.y));
       }
     }
     this.allPoints.sort((a, b) => a.x - b.x || a.y - b.y);
@@ -56,16 +56,16 @@ class Hull {
   toggle(e) {
     this.show = e.target.checked;
   }
-  draw() {
+  draw(canvas) {
     if (this.show) {
-      push();
-      noFill();
-      stroke(0, 100, 50);
-      strokeWeight(4);
-      beginShape();
-      this.hullPoints.forEach((point) => vertex(point.x, point.y));
-      endShape(CLOSE);
-      pop();
+      canvas.push();
+      canvas.noFill();
+      canvas.stroke(0, 100, 50);
+      canvas.strokeWeight(4);
+      canvas.beginShape();
+      this.hullPoints.forEach((point) => canvas.vertex(point.x, point.y));
+      canvas.endShape(store.sketchInstance.CLOSE);
+      canvas.pop();
     }
   }
 }

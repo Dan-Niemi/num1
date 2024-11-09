@@ -2,7 +2,7 @@ let rooms = [] //room IDs
 const WORLDWIDTH = 8000
 const WORLDHEIGHT = 8000
 const SPAWNRADIUS = 800
-const RADMIN = 20
+const RADMIN = 15
 const RADMAX = 120
 const POINTSMIN = 5
 const POINTSMAX = 12
@@ -55,7 +55,7 @@ class PartyServer {
     }
     if (data.type === "addRock") {
       let id = this.rockCounter++
-      let r = this.newRock(id, data.pos)
+      let r = this.newRock(id, data.pos,)
       this.rocks.push(r)
       this.room.broadcast(JSON.stringify({ type: "addRock", rock: r }))
     }
@@ -71,7 +71,7 @@ class PartyServer {
   }
 
 
-  newRock(id, pos, rad) {
+  newRock(id, pos, rad = Math.random() * (RADMAX - RADMIN) + RADMIN) {
     let points = []
     let numPoints = Math.random() * (POINTSMAX - POINTSMIN) + POINTSMIN;
     // make points    

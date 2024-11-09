@@ -1,3 +1,84 @@
+const sketch = (p) => {
+  let w, g;
+  p.setup = () => {
+    p.colorMode(p.HSB)
+    p.createCanvas(p.windowWidth, p.windowHeight)
+    p.noStroke()
+    w = p.createGraphics(store.world.width, store.world.height)
+    w.colorMode(p.HSB)
+    w.noStroke()
+    w.imageMode(p.CENTER)
+    g = p.createGraphics(250, 250)
+    g.colorMode(p.HSB)
+    g.noStroke()
+    for (let i = 0; i < 200; i++) {
+      g.fill(240, p.random(20), p.random(50), p.random(0.02));
+      g.ellipse(p.random(g.width), p.random(g.height), p.random(60), p.random(60));
+      g.fill(240, p.random(20), p.random(50), p.random(0.2));
+      g.ellipse(p.random(g.width), p.random(g.height), p.random(5), p.random(5));
+    }
+  }
+  p.draw = () => {
+    p.background(0, 0, 90);
+    w.clear();
+    drawRocks();
+    getInput();
+    store.hull.draw(w);
+    p.image(w, 0, 0);
+
+
+  }
+  p.windowResized = () => {
+    p.resizeCanvas(p.windowWidth, p.windowHeight)
+  }
+  function drawRocks() {
+    store.rocks.forEach(rock => drawRock(rock, 'base'));
+    if (store.selectedRock) {
+      drawRock(store.selectedRock, 'selected');
+      let overlapping = store.selectedRock.getOverlapping(store.rocks);
+      if (overlapping) {
+        overlapping.forEach(rock => drawRock(rock, 'overlapping'))
+      }
+    }
+  }
+
+  function drawRock(rock, type) {
+    if (type === 'base') {
+      w.fill(220, 10, rock.lightness)
+      drawBase(rock)
+      drawSpeckles(rock)
+    }
+    if (type === 'selected') {
+      w.fill(220, 10, 0,0.2)
+      drawBase(rock)
+    }
+    if (type === 'overlapping') {
+      w.fill(350, 100, 100, 0.3)
+      drawBase(rock)
+    }
+  }
+
+  function drawBase(rock) {
+    w.beginShape()
+    rock.globalPoints.forEach(point => w.vertex(point.x, point.y))
+    w.endShape(p.CLOSE)
+  }
+  function drawSpeckles(rock) {
+    w.push()
+    w.beginClip();
+    drawBase(rock)
+    w.endClip();
+    let c = rock.center
+    c.add(rock.pos)
+    w.translate(c.x,c.y);
+    w.scale(rock.scale);
+    w.rotate(rock.rot);
+    w.image(g, 0, 0);
+    w.pop();
+  }
+
+}
+
 const KEYS = {}
 const COLORS = {};
 const SETTINGS = {
@@ -18,21 +99,34 @@ document.addEventListener("alpine:init", () => {
     id: null,
     room: null,
     // game scope
+    sketchInstance: null,
+    world: {},
     rocks: [],
     cursors: [],
     hull: null,
-    mousePrev: null,
+    mousePrev: new Vector2(0, 0),
     selectedRock: null,
+    init() {
+      document.addEventListener("keydown", e => KEYS[e.key] = true);
+      document.addEventListener("keyup", e => KEYS[e.key] = false);
+      document.addEventListener("mousedown", e => KEYS["m" + e.button] = true);
+      document.addEventListener("mouseup", e => KEYS["m" + e.button] = false);
+      document.addEventListener("contextmenu", e => e.preventDefault());
+      document.addEventListener("mousedown", e => { handleMouseDown(e) });
+      document.addEventListener("mousemove", e => { handleMouseMove(e) });
+      document.addEventListener("wheel", e => { handleWheel(e) }, { passive: false });
 
+    },
     joinRoom() {
       connectToRoom(this.roomInput)
       this.roomInput = ''
     },
+
     deleteRock(rock) {
       socket.send(JSON.stringify({ type: "deleteRock", id: rock.id, }))
     },
     addRock(pos) {
-      socket.send(JSON.stringify({ type: "addRock", pos: pos, }));
+      socket.send(JSON.stringify({ type: "addRock", pos: pos}));
     },
     leaveRoom() {
       socket.close();
@@ -41,50 +135,13 @@ document.addEventListener("alpine:init", () => {
       this.cursors = [];
       this.hull = null;
       this.room = null;
+      this.sketchInstance.remove()
       lobby.send(JSON.stringify({ type: "playerUpdate", room: this.room }))
     }
   });
   window.store = Alpine.store("data");
 });
 
-function setup() {
-  colorMode(HSL);
-  const c = createCanvas(windowWidth, windowHeight);
-  c.parent('canvasWrapper')
-  noStroke();
-  COLORS.base = color(240, 8, 75);
-  COLORS.overlap = color(0, 100, 50, 0.2);
-  COLORS.selected = color(240, 8, 0, 0.2);
-  document.addEventListener("keydown", e => KEYS[e.key] = true);
-  document.addEventListener("keyup", e => KEYS[e.key] = false);
-  document.addEventListener("mousedown", e => KEYS["m" + e.button] = true);
-  document.addEventListener("mouseup", e => { KEYS["m" + e.button] = false; canvasGrabbed = false });
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("mousedown", e => { handleMouseDown(e) });
-  document.addEventListener("mousemove", e => { handleMouseMove(e) });
-  document.addEventListener("wheel", e => { handleWheel(e) }, { passive: false });
-
-  window.addEventListener('resize', e => resizeCanvas(windowWidth, windowHeight))
-}
-
-function draw() {
-  getInput();
-  background(240, 2, 95);
-  // draw base rock
-  store.rocks.forEach(rock => rock.draw(rock.color));
-  // draw selected rock
-  if (store.selectedRock) {
-    store.selectedRock.draw(COLORS.selected);
-    // draw overlapping rocks
-    let overlapping = store.selectedRock.checkOverlap(store.rocks);
-    if (overlapping) {
-      overlapping.forEach(rock => rock.draw(COLORS.overlap));
-    }
-  }
-  if (store.hull) {
-    store.hull.draw();
-  }
-}
 
 function getInput() {
   if (store.selectedRock) {
@@ -104,25 +161,30 @@ function placeRock() {
 
 function handleWheel(e) {
   e.preventDefault();
-  if (store.selectedRock) { store.selectedRock.rotate(e.deltaY * SETTINGS.rotSpeedWheel * SETTINGS.mult); }
+  if (store.selectedRock) {
+    store.selectedRock.rotate(e.deltaY * SETTINGS.rotSpeedWheel * SETTINGS.mult);
+  }
 
 }
 function handleMouseMove(e) {
-  let delta = createVector(e.clientX, e.clientY).sub(store.mousePrev);
+  let delta = new Vector2(e.clientX, e.clientY)
+  delta.sub(store.mousePrev);
+
   if (store.selectedRock) {
     store.selectedRock.move(delta);
   }
-  store.mousePrev = createVector(e.clientX, e.clientY);
-  if (socket){
+  store.mousePrev = new Vector2(e.clientX, e.clientY);
+  if (socket) {
     socket.send(JSON.stringify({ type: "cursorUpdate", pos: { x: e.clientX, y: e.clientY } }));
   }
 }
 
 function handleMouseDown(e) {
+  if (!store.sketchInstance) { return }
   if (e.button == 0) {
     if (store.selectedRock) {
       // PLACE ROCK
-      if (!store.selectedRock.checkOverlap(store.rocks)) {
+      if (!store.selectedRock.getOverlapping(store.rocks)) {
         placeRock()
         return;
       }
@@ -130,7 +192,7 @@ function handleMouseDown(e) {
     if (!store.selectedRock) {
       // PICK ROCK
       for (let rock of store.rocks) {
-        if (rock.collidePoint(createVector(mouseX, mouseY))) {
+        if (rock.isPointInPolygon(new Vector2(store.sketchInstance.mouseX, store.sketchInstance.mouseY))) {
           store.selectedRock = rock;
           return;
         }
@@ -141,13 +203,14 @@ function handleMouseDown(e) {
     // DELETE ROCK IF CLICKED
     if (!store.selectedRock) {
       for (let rock of store.rocks) {
-        if (rock.collidePoint(createVector(mouseX, mouseY))) {
+        if (rock.isPointInPolygon(new Vector2(e.clientX, e.clientY))) {
           store.deleteRock(rock)
           return;
         }
       }
       // OTHERWISE ADD NEW ROCK IF NO ROCK CLICKED
-      store.addRock(createVector(mouseX, mouseY))
+      store.addRock(new Vector2(e.clientX, e.clientY))
     }
   }
 }
+
