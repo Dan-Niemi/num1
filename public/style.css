@@ -10,10 +10,6 @@ img, picture, video, canvas, svg { display: block; max-width: 100%; }
 input, button, textarea, select { font: inherit; } 
 p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; } 
 
-
-
-.sidebar { position: absolute; top: 0; left:0; padding: 1rem; } 
-.control label,.debug label { display: flex; gap: 1rem; } 
 body { background-color: hsl(240, 2%, 95%); } 
 
 [x-cloak] { display: none !important; } 

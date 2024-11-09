@@ -25,9 +25,12 @@
   </head>
   <body x-data>
     <!-- OPEN SCREEN -->
-    <div x-show="!store.room" class="absolute flex items-center justify-center h-screen w-screen">
-      <label>Room name: <input @keyup.enter="store.joinRoom()" x-model="store.roomInput" type="text" /></label>
-      <button @click="store.joinRoom()">Join room</button>
+    <div x-show="!store.room" class="absolute flex flex-col gap-4 items-center justify-center h-screen w-screen">
+      <div class="flex flex-col items-center gap-2">
+        <label for="room">Room name: </label>
+        <input class="border border-gray-400 p-2" @keyup.enter="store.joinRoom()" x-model="store.roomInput" type="text" name="room"/>
+      </div>
+      <button class="py-3 px-6 bg-slate-500 text-white font-bold " @click="store.joinRoom()">Join room</button>
     </div>
     <!-- Player List -->
     <div class="absolute bottom-0 left-0 m-2">
@@ -42,8 +45,8 @@
     </div>
 
     <!-- SIDEBAR -->
-    <div x-cloak x-show="store.room" class="sidebar">
-      <ul style="padding-left: 1rem">
+    <div x-cloak x-show="store.room" class="absolute m-2">
+      <ul>
         <li>Click rock to select/place</li>
         <li>Mouse wheel or <strong>A</strong> and <strong>D</strong> to rotate</li>
         <li>Hold <strong>S</strong> for fine movement</li>
