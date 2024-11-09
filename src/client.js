@@ -29,12 +29,7 @@ window.connectToRoom = (roomString) => {
     const data = JSON.parse(event.data);
     switch (data.type) {
       case "connectionSelf":
-        store.rocks = data.rocks.map(rock => new Rock(rock))
-        store.room = data.room
-        store.world.width = data.worldWidth
-        store.world.height = data.worldHeight
-        store.sketchInstance = new p5(sketch, 'sketch-wrapper')
-        store.hull = new Hull(store.rocks)
+        store.setupRoom(data)
         lobby.send(JSON.stringify({ type: "playerUpdate", room: store.room }))
         break
       case "connection":
