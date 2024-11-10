@@ -22,7 +22,6 @@ class PartyServer {
       // let pos = { x: Math.random() * SPAWNRADIUS + WORLDWIDTH/2 - SPAWNRADIUS/2, y: Math.random() * SPAWNRADIUS + WORLDHEIGHT/2 - SPAWNRADIUS/2 }
       let rad = Math.random() * (RADMAX - RADMIN) + RADMIN;
       if (this.rocks.some(rock => dist(rock.pos, pos) < rad + rock.rad)) {
-        console.log(this.spawnAttempts++)
         continue //if too close to any, go to next loop to get a new random position
       }
       let id = 'rock' + this.rockCounter++

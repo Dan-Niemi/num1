@@ -15,7 +15,6 @@ lobby.onmessage = (event) =>{
     store.players = data.players
   }
 }
-
 window.connectToRoom = (roomString) => {
   socket = new PartySocket({
     host: PARTYKIT_HOST,
@@ -37,8 +36,8 @@ window.connectToRoom = (roomString) => {
         store.rooms = data.rooms
         break;
       case "cursorUpdate":
-        let c = store.cursors.find(cursor => cursor.id === data.id)
-        c.pos = data.pos
+        let cursor = store.cursors.find(cursor => cursor.id === data.id)
+        cursor.pos = data.pos
         break;
       case "cursorRemove":
         store.cursors = data.cursors

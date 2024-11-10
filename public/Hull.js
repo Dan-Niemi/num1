@@ -1,21 +1,25 @@
 class Hull {
   constructor(rocks = []) {
+    this.rocks = rocks;
     this.allPoints = [];
     this.hullPoints = [];
-    this.area = 0;
+    this.hullArea = 0;
+    this.rockArea = 0
     this.show = false;
     this.update(rocks);
   }
   update(rocks) {
     this.allPoints = [];
-    for (let rock of rocks) {
+    this.rocks = rocks;
+    for (let rock of this.rocks) {
       for (let point of rock.globalPoints) {
         this.allPoints.push(new Vector2(point.x, point.y));
       }
     }
     this.allPoints.sort((a, b) => a.x - b.x || a.y - b.y);
     this.updateHullPoints()
-    this.updateArea()
+    this.updateHullArea()
+    this.updateRockArea()
   }
 
   updateHullPoints() {
@@ -39,7 +43,7 @@ class Hull {
     this.hullPoints = lower.concat(upper);
   }
 
-  updateArea() {
+  updateHullArea() {
     let area = 0;
     let n = this.hullPoints.length;
     for (let i = 0; i < n; i++) {
@@ -47,7 +51,10 @@ class Hull {
       area += this.hullPoints[i].x * this.hullPoints[j].y;
       area -= this.hullPoints[j].x * this.hullPoints[i].y;
     }
-    this.area = Math.abs(area) / 2;
+    this.hullArea = Math.abs(area) / 2;
+  }
+  updateRockArea(){
+    this.rockArea = this.rocks.reduce((tot,rock) => tot + rock.area,0)
   }
 
   cross(o, a, b) {

@@ -23,7 +23,6 @@ class Lobby {
 	}
 	async onMessage(message, sender) {
 		const data = JSON.parse(message)
-		console.log(data)
 		if (data.type === 'playerUpdate') {
 			let p = players.find(player => player.id === sender.id);
 			p.room = data.room;

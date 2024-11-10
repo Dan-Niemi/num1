@@ -10,12 +10,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- P5 -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"></script>
-    <!-- <script defer src="https://unpkg.com/p5.collide2d"></script> -->
     <!-- ALPINE -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- PARTYKIT -->
     <script type="module" src="/dist/client.js"></script>
     <!-- CLASSES -->
+    <script src="./Vector2.js"></script>
     <script src="./Rock.js"></script>
     <script src="./Hull.js"></script>
     <!-- Easing -->
@@ -52,11 +52,11 @@
         <li>Hold <strong>S</strong> for fine movement</li>
         <li>Try to arrange all rocks in the smallest area</li>
       </ul>
-      <template x-if="store.gameStarted && store.hull">
-        <div x-data="{get polyArea(){ return $store.data.rocks.reduce((tot,rock) => tot + rock.area,0)}}" class="debug">
-          <div x-text=" polyArea && `Rock Area:${Math.round(polyArea / 1000)}`"></div>
-          <div x-text=" $store.data.hull && `Container Area:${Math.round($store.data.hull.area / 1000)}`"></div>
-          <div x-text="`Score: ${((polyArea / $store.data.hull.area) * 100).toFixed(0)}%`"></div>
+      <template x-if="store.hull">
+        <div class="debug">
+          <div x-text=" `Rock Area:${Math.round(store.hull.rockArea / 1000)}`"></div>
+          <div x-text=" `Container Area:${Math.round(store.hull.hullArea / 1000)}`"></div>
+          <div x-text="`Score: ${((store.hull.rockArea / store.hull.hullArea) * 100).toFixed(0)}%`"></div>
         </div>
       </template>
       <div class="control">
@@ -65,16 +65,15 @@
       <button @click="store.leaveRoom()">Leave Room</button>
     </div>
 
-    <div class="cursors">
-      <template x-for="cursor in $store.data.cursors">
-        <template x-if="cursor.id != $store.data.id">
-          <div class="cursor" :style="`pointer-events: none; position:absolute;translate: ${cursor.pos.x}px ${cursor.pos.y}px `">
+    <div class="absolute">
+      <template x-for="cursor in store.cursors">
+        <template x-if="cursor.id != store.id">
+          <div class="cursor" class="pointer-events-none absolute" :style="`translate: ${cursor.pos.x}px ${cursor.pos.y}px `">
             <span x-text="`(${cursor.pos.x},${cursor.pos.y})`"></span>
           </div>
         </template>
       </template>
     </div>
-
     <div id="sketch-wrapper"></div>
   </body>
 </html>
