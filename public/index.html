@@ -46,7 +46,7 @@
     </div>
 
     <!-- SIDEBAR -->
-    <div x-cloak x-show="store.room" class="absolute m-2">
+    <div x-cloak x-show="store.room" class="absolute top-12 m-2">
       <ul>
         <li>Click rock to select/place</li>
         <li>Mouse wheel or <strong>A</strong> and <strong>D</strong> to rotate</li>
@@ -58,11 +58,9 @@
           <div x-text=" `Rock Area:${Math.round(store.hull.rockArea / 1000)}`"></div>
           <div x-text=" `Container Area:${Math.round(store.hull.hullArea / 1000)}`"></div>
           <div x-text="`Score: ${((store.hull.rockArea / store.hull.hullArea) * 100).toFixed(0)}%`"></div>
+          <label>Show Hull<input class="ml-2"  type="checkbox" x-model="store.hull.show" /></label>
         </div>
       </template>
-      <div class="control">
-        <label>Show Hull<input type="checkbox" @click="$store.data.hull.toggle(event)" /></label>
-      </div>
       <button @click="store.leaveRoom()">Leave Room</button>
     </div>
 <!-- CURSORS -->

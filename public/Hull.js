@@ -60,9 +60,7 @@ class Hull {
   cross(o, a, b) {
     return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
   }
-  toggle(e) {
-    this.show = e.target.checked;
-  }
+
   draw(canvas) {
     if (this.show) {
       canvas.push();

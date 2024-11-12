@@ -1,11 +1,15 @@
 window.p = null;
 const sketch = (p) => {
 	let w, s; //p = viewport, w = world, s = speckles
-
+	let colorPicker
 
 	p.setup = () => {
 		// VIEWPORT
 		p.colorMode(p.HSB)
+		colorPicker = p.createColorPicker('#abb0ba')
+		colorPicker.size(100, 40)
+		colorPicker.position(8, 8)
+		p.pixelDensity(1)
 		p.createCanvas(p.windowWidth, p.windowHeight)
 		p.noStroke()
 		// WORLD
@@ -63,12 +67,13 @@ const sketch = (p) => {
 
 	function drawRock(rock, type) {
 		if (type === 'base') {
-			w.fill(220, 10, rock.lightness)
+			let col = colorPicker.color();
+			w.fill(p.hue(col), p.saturation(col), p.lightness(col) + rock.lightness)
 			drawBase(rock)
 			drawSpeckles(rock)
 		}
 		if (type === 'selected') {
-			w.fill(220, 10, 0, 0.2)
+			w.fill(0, 0, 0, 0.2)
 			drawBase(rock)
 		}
 		if (type === 'overlapping') {

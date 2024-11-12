@@ -10,7 +10,7 @@ class Rock {
     this.speckles = p.createSpeckles(this) // needs the p5 instance to be active
     this.updateGlobalPoints()
     // VISUALS
-    this.lightness = Math.floor(Math.random() * 15) + 70;
+    this.lightness = Math.floor(Math.random() * 40 - 20);
     // ANIMATION
     this.animEasing = BezierEasing(0.25, 0.1, 0.0, 1.5) //using bezier-easing library
     this.animDuration = 300;
