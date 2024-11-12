@@ -1,10 +1,12 @@
 let players = []
 let rooms = []
 
+
 class Lobby {
 	constructor(room) {
 		this.room = room
 		this.resetLobby()
+
 	}
 	async onConnect(conn, _ctx) {
 		const storedPlayers = await this.room.storage.get('players');

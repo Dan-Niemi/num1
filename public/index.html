@@ -21,6 +21,7 @@
     <!-- Easing -->
     <script src="./bezier-easing.js"></script>
     <!-- APP -->
+    <script src="./sketch.js"></script>
     <script src="./app.js"></script>
   </head>
   <body x-data>
@@ -64,7 +65,7 @@
       </div>
       <button @click="store.leaveRoom()">Leave Room</button>
     </div>
-
+<!-- CURSORS -->
     <div class="absolute">
       <template x-for="cursor in store.cursors">
         <template x-if="cursor.id != store.id">

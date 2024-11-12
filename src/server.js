@@ -18,8 +18,7 @@ class PartyServer {
     this.rocks = [];
     rooms.push(this.room.id)
     while (this.rocks.length < NUMROCKS && this.spawnAttempts < 100) {
-      let pos = { x: Math.random() * SPAWNRADIUS , y: Math.random() * SPAWNRADIUS}
-      // let pos = { x: Math.random() * SPAWNRADIUS + WORLDWIDTH/2 - SPAWNRADIUS/2, y: Math.random() * SPAWNRADIUS + WORLDHEIGHT/2 - SPAWNRADIUS/2 }
+      let pos = { x: Math.random() * SPAWNRADIUS + WORLDWIDTH / 2 - SPAWNRADIUS / 2, y: Math.random() * SPAWNRADIUS + WORLDHEIGHT / 2 - SPAWNRADIUS / 2 }
       let rad = Math.random() * (RADMAX - RADMIN) + RADMIN;
       if (this.rocks.some(rock => dist(rock.pos, pos) < rad + rock.rad)) {
         continue //if too close to any, go to next loop to get a new random position
@@ -29,9 +28,11 @@ class PartyServer {
     }
 
   }
+
+
   onConnect(conn, _ctx) {
     this.cursors.push({ id: conn.id, pos: { x: 0, y: 0 } });
-    conn.send(JSON.stringify({ type: "connectionSelf", id: conn.id, rocks: this.rocks, room: this.room.id,worldWidth:WORLDWIDTH,worldHeight:WORLDHEIGHT }));
+    conn.send(JSON.stringify({ type: "connectionSelf", id: conn.id, rocks: this.rocks, room: this.room.id, worldWidth: WORLDWIDTH, worldHeight: WORLDHEIGHT }));
     this.room.broadcast(JSON.stringify({ type: "connection", rooms: rooms, cursors: this.cursors }));
   }
 
@@ -66,9 +67,7 @@ class PartyServer {
     if ([...this.room.getConnections()].length < 1) {
       rooms = rooms.filter(room => room !== this.room)
     }
-
   }
-
 
   newRock(id, pos, rad = Math.random() * (RADMAX - RADMIN) + RADMIN) {
     let points = []
@@ -87,7 +86,6 @@ class PartyServer {
     points.sort((a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx))
     return { pos: pos, points: points, rad: rad, radMax: RADMAX, id: id }
   }
-
 }
 
 export default PartyServer;

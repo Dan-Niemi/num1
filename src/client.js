@@ -37,7 +37,8 @@ window.connectToRoom = (roomString) => {
         break;
       case "cursorUpdate":
         let cursor = store.cursors.find(cursor => cursor.id === data.id)
-        cursor.pos = data.pos
+        cursor.pos = new Vector2(data.pos.x,data.pos.y)
+        cursor.pos.sub(store.world.pos)
         break;
       case "cursorRemove":
         store.cursors = data.cursors
