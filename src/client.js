@@ -51,6 +51,7 @@ window.connectToRoom = (roomString) => {
         break;
       case "deleteRock":
         store.rocks = store.rocks.filter(rock => rock.id !== data.id)
+        store.hull.update(store.rocks)
         break;
       case "addRock":
         store.rocks.push(new Rock(data.rock))

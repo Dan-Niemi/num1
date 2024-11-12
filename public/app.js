@@ -41,12 +41,23 @@ document.addEventListener("alpine:init", () => {
       this.roomInput = ''
     },
     setupRoom(data) {
-      this.rocks = data.rocks.map(rock => new Rock(rock))
       this.room = data.room
       this.world.width = data.worldWidth
       this.world.height = data.worldHeight
-      this.world.pos = new Vector2(this.world.width/2-window.innerWidth/2,this.world.height/2 - window.innerHeight/2)
+      this.world.pos = new Vector2(this.world.width / 2 - window.innerWidth / 2, this.world.height / 2 - window.innerHeight / 2)
       window.p = new p5(sketch, 'sketch-wrapper')
+
+      function timer(delay) {
+        return new Promise(result => setTimeout(result, delay))
+      }
+
+      (async () => {
+        for (let rock of data.rocks) {
+          this.rocks.push(new Rock(rock));
+          await timer(100);
+        }
+      })()
+
       this.hull = new Hull(store.rocks)
     },
     deleteRock(rock) {
@@ -99,8 +110,8 @@ function handleWheel(e) {
 }
 function handleMouseMove(e) {
   if (!p) { return }
-  let mousePos = new Vector2(e.clientX,e.clientY)
-  let delta = Vector2.sub(mousePos,store.mousePrev)
+  let mousePos = new Vector2(e.clientX, e.clientY)
+  let delta = Vector2.sub(mousePos, store.mousePrev)
   if (store.selectedRock) {//MOVE ROCK
     store.selectedRock.move(delta);
   } else if (KEYS["m0"] && store.world.grabbed) {// MOVE WINDOW

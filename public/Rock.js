@@ -7,6 +7,7 @@ class Rock {
     this.rad = data.rad;
     this.id = data.id;
     this.globalPoints = [];
+    this.speckles = p.createSpeckles(this) // needs the p5 instance to be active
     this.updateGlobalPoints()
     // VISUALS
     this.lightness = Math.floor(Math.random() * 15) + 70;
@@ -27,7 +28,7 @@ class Rock {
       this.scale = 1;
     }, this.animDuration);
   }
-
+  
   get area() {
     let area = 0;
     let n = this.points.length;
